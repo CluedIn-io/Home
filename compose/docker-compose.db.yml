@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+    sqlserver:
+        image: cluedin/sqlserver:${CLUEDIN_DOCKER_TAG}
+        entrypoint: ["sh","-c","/init/init.sh"]
+        ports:
+            - "1433:1433"

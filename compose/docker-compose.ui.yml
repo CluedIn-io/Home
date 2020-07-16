@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  ui:
+    image: cluedin/ui:${CLUEDIN_DOCKER_TAG}
+    ports:
+    - "80:80"
+    environment:
+    - REACT_APP_UI_APP=http://app.127.0.0.1.xip.io
+    - REACT_APP_UI_APP_SUBDOMAIN=app
+    - REACT_APP_UI_BUCKET=/public/img/providers/
+    - REACT_APP_UI_CDN_URL=/
+    - REACT_APP_UI_CLUEDIN_APP_DOMAIN=127.0.0.1.xip.io
+    - REACT_APP_UI_CLUEDIN_FEATURES=follow;savedSearches;users;data-governance;developer;settings;integrations;extended-sar;annotation;datasource
+    - REACT_APP_UI_GQL_URL=http://localhost:8888/
+    - REACT_APP_UI_COOKIE_DOMAIN_NAME=127.0.0.1.xip.io
+    - REACT_APP_UI_ENV=production
+    - REACT_APP_UI_MAIN_DOMAIN=127.0.0.1.xip.io
+    - REACT_APP_UI_PROTOCOL=http://
+    depends_on:
+    - cluedin
+
+  gql:
+    image: cluedin/cluedin-ui-gql:${CLUEDIN_DOCKER_TAG}
+    environment:
+        - "AUTH_API=http://cluedin:9001/"
+        - "WEB_API=http://cluedin:9000/"
+        - "MICRO_CLEAN_URL=http://micro-clean:8888"
+        - "MICRO_ANNOTATION_URL=http://micro-annotation:8888"
+        - "MICRO_DATASOURCE_URL=http://micro-datasource:8888"
+        - "APP_API_URL=http://webapi:9008/"
+        - "PUBLIC_API=http://cluedin:9007/"
+        - "WEBHOOKS_URL=http://cluedin:9006/"
+    ports:
+    - "8888:8888"
+    depends_on:
+    - cluedin
+    - micro-annotation
+    - micro-clean
+    - micro-datasource
+    - webapi

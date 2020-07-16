@@ -1,0 +1,72 @@
+version: '3.7'
+services:
+  micro-clean:
+    image: cluedin/cluedin-micro-clean:${CLUEDIN_DOCKER_TAG}
+    environment:
+    - RabbitMQ_CS=amqp://guest:guest@rabbitmq:5672
+    - ElasticURL=http://elasticsearch:9200
+    - SeqURL=http://seq:5341
+    - SeqLoggingLevel=debug
+    - LegacyURL=http://cluedin:9000
+    - DbHost=${CLUEDIN_DB_HOST}
+    - DbPassword=${CLUEDIN_DB_PASS}
+    - DbUserName=${CLUEDIN_DB_USER}
+    - DbName=DataStore.Db.MicroServices
+    - ForceTableCreation=${FORCE_TABLE_CREATION:-true}
+    depends_on:
+    - elasticsearch
+    - rabbitmq
+    - sqlserver
+    - seq
+    - cluedin
+
+  micro-annotation:
+    image: cluedin/cluedin-micro-annotation:${CLUEDIN_DOCKER_TAG}
+    environment:
+    - RabbitMQ_CS=amqp://guest:guest@rabbitmq:5672
+    - DbHost=${CLUEDIN_DB_HOST}
+    - DbPassword=${CLUEDIN_DB_PASS}
+    - DbUserName=${CLUEDIN_DB_USER}
+    - DbName=${DB_NAME:-DataStore.Db.MicroServices}
+    - SeqURL=http://seq:5341
+    - SeqLoggingLevel=debug
+    - ForceTableCreation=${FORCE_TABLE_CREATION:-true}
+    depends_on:
+    - rabbitmq
+    - sqlserver
+    - seq
+
+  micro-datasource:
+    image: cluedin/cluedin-micro-datasource:${CLUEDIN_DOCKER_TAG}
+    environment:
+    - RabbitMQ_CS=amqp://guest:guest@rabbitmq:5672
+    - ElasticURL=http://elasticsearch:9200
+    - DbName=DataStore.Db.MicroServices
+    - DbHost=${CLUEDIN_DB_HOST}
+    - DbPassword=${CLUEDIN_DB_PASS}
+    - DbUserName=${CLUEDIN_DB_USER}
+    - SeqURL=http://seq:5341
+    - SeqLoggingLevel=debug
+    - AnnotationURL=http://micro-annotation:8888
+    - ConsoleLoggingLevel=info
+    - ForceTableCreation=${FORCE_TABLE_CREATION:-true}
+    depends_on:
+    - elasticsearch
+    - rabbitmq
+    - sqlserver
+    - seq
+    - micro-annotation
+
+  micro-submitter:
+    image: cluedin/cluedin-micro-submitter:${CLUEDIN_DOCKER_TAG}
+    environment:
+      CluedIn_API_URL: "http://cluedin:9007/"
+      RabbitMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+      Serilog__WriteTo__1__Name: Seq
+      Serilog__WriteTo__1__Args__serverUrl: http://seq:5341
+      # needs $$ to escape the dollar sign
+      Serilog__WriteTo__1__Args__controlLevelSwitch: "$$controlSwitch"
+    depends_on:
+    - cluedin
+    - rabbitmq
+    - seq
