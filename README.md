@@ -107,7 +107,7 @@ Usage: (with specific tag)
 pwsh cluedin.ps1 stop -tag 3.1-alpha
 ```
 
-This command will stop all the CluedIn containers abut not remove the data. The containers can be brought back online by using the `up` command again.
+This command will stop all the CluedIn containers but not remove the data. The containers can be brought back online by using the `up` command again.
 
 ### Status
 
