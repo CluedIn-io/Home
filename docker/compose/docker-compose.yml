@@ -6,29 +6,33 @@ services:
             - NEO4J_AUTH=none
             - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
         ports:
-            - "7474:7474"
-            - "7687:7687"
+            - "${CLUEDIN_NEO4J_HTTP_LOCALPORT:-7474}:7474"
+            - "${CLUEDIN_NEO4J_BOLT_LOCALPORT:-7687}:7687"
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
         environment:
             - discovery.type=single-node
         ports:
-            - "9200:9200"
-            - "9300:9300"
+            - "${CLUEDIN_ELASTIC_HTTP_LOCALPORT:-9200}:9200"
+            - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
     rabbitmq:
         image: rabbitmq:3.7-management-alpine
         ports:
-            - "5672:5672"
-            - "15672:15672"
+            - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
+            - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
         hostname: cluedin-dev
     redis:
         image: redis:5.0-alpine
         ports:
-            - "6379:6379"
+            - "${CLUEDIN_REDIS_LOCALPORT:-6379}:6379"
     seq:
         image: datalust/seq:5
         environment:
             ACCEPT_EULA: 'Y'
         ports:
-            - "3200:80"
-            - "5341:5341"
+            - "${CLUEDIN_SEQ_UI_LOCALPORT:-3200}:80"
+            - "${CLUEDIN_SEQ_DATA_LOCALPORT:-5341}:5341"
+    openrefine:
+        image: cluedin/openrefine:${CLUEDIN_DOCKER_TAG}
+        ports:
+            - "${CLUEDIN_OPENREFINE_LOCALPORT:-3333}:3333"

@@ -1,5 +1,7 @@
 using namespace System.Management.Automation
 
+$script:emojiSupported = $IsLinux -or $IsMacOS -or ($IsWindows -and ($env:WT_SESSION -or $env:TERM_PROGRAM))
+
 function Set-Environment {
     [OutputType([EnvironmentToggle])]
     [CmdletBinding()]

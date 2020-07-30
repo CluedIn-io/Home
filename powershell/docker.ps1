@@ -11,19 +11,24 @@ function DockerCompose {
         [String[]]$Disable = @()
     )
 
-    $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
-    $composeFiles = Get-ChildItem $composeRoot -Filter 'docker-compose*.yml' |
-        ForEach-Object { "-f $($_.FullName)" }
-
-    $disableFags = $Disable | ForEach-Object { "--scale ${_}=0" }
-
-    $envFile = $Env | FindEnvironment | ForEach-Object { "--env-file $($_.FullName)" }
-    if(-not $envFile) {
+    $envPath = $Env | FindEnvironment | ForEach-Object { "--project-directory $($_.FullName)" }
+    if(-not $envPath) {
         Write-Host "Could not find environment ${Env}"
         return
     }
-    $projectName = "-p cluedin"
-    $compose = "docker-compose --project-directory $composeRoot $projectName $composeFiles $envFile $Action $disableFags $AdditionalArgs"
+
+    $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
+
+    $projectName = "-p cluedin_$($Env.ToLowerInvariant())"
+    $composeFiles = Get-ChildItem $composeRoot -Filter 'docker-compose*.yml' | ForEach-Object { "-f $($_.FullName)" }
+
+    $compose = "docker-compose $projectName $composeFiles $envPath $action"
+
+    $disableFags = $Disable | Where-Object { $_ } | ForEach-Object { "--scale ${_}=0" }
+    if($disableFags) { $compose += " ${disableFags}" }
+
+    if($AdditionalArgs) { $compose += " ${AdditionalArgs}" }
+
     Write-Verbose "[docker]: $compose"
     $envVars = @{}
     if($Tag){
@@ -48,7 +53,7 @@ function Invoke-DockerCompose {
     param(
         [Parameter(Mandatory)]
         [String]$Action,
-        [String]$Env,
+        [String]$Env = 'default',
         [String]$Tag
     )
 
@@ -61,7 +66,7 @@ function Invoke-DockerComposeUp {
     [CluedInAction(Action = 'up', Header = 'Environment => {0}')]
     [CmdletBinding()]
     param(
-        [String]$Env,
+        [String]$Env = 'default',
         [String]$Tag,
         [String[]]$Disable,
         [Switch]$Pull
@@ -75,5 +80,5 @@ function Invoke-DockerComposeUp {
         DockerCompose -Action 'pull' @PSBoundParameters
     }
 
-    DockerCompose -Action 'up' -AdditionalArgs '--remove-orphans -d' @PSBoundParameters
+    DockerCompose -Action 'up' -Disable $Disable -AdditionalArgs '--remove-orphans -d' @PSBoundParameters
 }

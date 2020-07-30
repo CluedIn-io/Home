@@ -4,4 +4,4 @@ services:
         image: cluedin/sqlserver:${CLUEDIN_DOCKER_TAG}
         entrypoint: ["sh","-c","/init/init.sh"]
         ports:
-            - "1433:1433"
+            - "${CLUEDIN_SQLSERVER_LOCALPORT:-1433}:1433"

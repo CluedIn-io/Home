@@ -2,17 +2,59 @@ using namespace System.Management.Automation
 using namespace System.IO
 using namespace System.Collections.Generic
 
+enum CheckResultState {
+    Success
+    Failure
+    Warning
+
+}
+
 class CheckResult {
-    [Boolean]$Success
+    [CheckResultState]$State
     [String]$Details
+    [String]$Name
+    [String]$FailMessage
+
+    CheckResult([CheckResultState]$State) {
+        $this.State = $State
+    }
+
+    CheckResult([CheckResultState]$State, [String]$Details) {
+        $this.State = $State
+        $this.Details = $Details
+    }
 
     CheckResult([Boolean]$Success) {
-        $this.Success = $Success
+        $this.State = $Success ? [CheckResultState]::Success : [CheckResultState]::Failure
     }
 
     CheckResult([Boolean]$Success, [String]$Details) {
-        $this.Success = $Success
+        $this.State = $Success ? [CheckResultState]::Success : [CheckResultState]::Failure
         $this.Details = $Details
+    }
+
+    [void] Print() {
+        if($script:emojiSupported) {
+            $symbol = switch($this.State){
+                ([CheckResultState]::Success.ToString()) { '✅'; break }
+                ([CheckResultState]::Failure.ToString()) { '❌'; break }
+                ([CheckResultState]::Warning.ToString()) { '⚠️ '; break }
+            }
+            Write-Host $symbol -NoNewline
+        } else {
+            switch($this.State){
+                ([CheckResultState]::Success.ToString()) {
+                    Write-Host "`u{221A}" -ForegroundColor Green -NoNewline; break
+                }
+                ([CheckResultState]::Failure.ToString()) {
+                    Write-Host "`u{00D7}" -ForegroundColor Red -NoNewline; break
+                }
+                ([CheckResultState]::Warning.ToString()) {
+                    Write-Host "`u{203C}" -ForegroundColor Yellow -NoNewline; break
+                }
+            }
+        }
+        Write-Host " `u{00BB} $($this.Name) : $($this.Details)"
     }
 }
 
@@ -39,33 +81,31 @@ class Check {
         $this.FailMessage = $FailMessage
     }
 
-    [bool] Run() {
+    [CheckResult] Run() {
         try {
             $this.Result = $this.Action.InvokeReturnAsIs($this)
         }
         catch {
-            $this.Result = [CheckResult]::new($false)
+            $this.Result = [CheckResult]::new([CheckResultState]::Failure)
         }
 
-        return $this.Result.Success
-    }
-
-    [String] Report() {
-        $line = "$($this.Result.Success ? '✅' : '❌') => $($this.Name)"
-        if ($this.Result.Details) { $line += " : $($this.Result.Details)" }
-        return $line
+        $this.Result.Name = $this.Name
+        $this.Result.FailMessage = $this.FailMessage
+        return $this.Result
     }
 }
 
 class PortCheck : Check {
     [Int]$Port
+    [String]$Domain = 'localhost'
 
-    PortCheck([String]$Name, [Int]$Port) : base($Name, {
-            $info = Test-Connection -ComputerName localhost -TcpPort $args[0].Port -WarningAction Ignore
+    PortCheck([String]$Name, [Int]$Port, [String]$Domain) : base($Name, {
+            $info = Test-Connection -ComputerName $args[0].Domain -TcpPort $args[0].Port -WarningAction Ignore
             $success = -not [Boolean]::Parse($info)
-            [CheckResult]::new($success, "")
+            [CheckResult]::new($success, "$($args[0].Domain):$($args[0].Port)")
         }, "The specified port must be available." ) {
 
+        $this.Domain = $Domain
         $this.Port = $Port
     }
 }
@@ -75,7 +115,7 @@ class CheckCollection {
     [String]$Name
     [Parameter(Mandatory)]
     [Check[]]$Checks
-    hidden [List[Check]]$FailedChecks = [List[Check]]::new()
+    hidden [List[CheckResult]]$FailedChecks = [List[CheckResult]]::new()
 
     CheckCollection([String]$Name, [Check[]]$Checks) {
         $this.Name = $Name
@@ -83,16 +123,16 @@ class CheckCollection {
     }
 
     [int] Run() {
-        Write-Host "Checking $($this.Name)"
+        Write-Host "$($this.Name)"
         $count = $this.Checks.Count
         for ($i = 0; $i -lt $count; $i++) {
             $check = $this.Checks[$i]
-            $success = $check.Run()
+            $result = $check.Run()
             Write-Host "  [$($i+1)/${count}] " -NoNewline
-            Write-Host $check.Report()
+            $result.Print()
 
-            if(-not $success) {
-                $this.FailedChecks.Add($check)
+            if($result.State -ne [CheckResultState]::Success) {
+                $this.FailedChecks.Add($result)
             }
         }
 
@@ -100,9 +140,9 @@ class CheckCollection {
     }
 
     [void] ReportErrors() {
-        foreach($check in $this.FailedChecks) {
-           Write-Host $check.Report()
-           Write-Host $check.FailMessage
+        foreach($result in $this.FailedChecks) {
+           $result.Print()
+           Write-Host "     $($result.FailMessage)"
         }
     }
 }
@@ -120,7 +160,11 @@ function CheckReport {
 
     if($errorCount -gt 0) {
         Write-Host ''
-        Write-Host "🚧 [${errorCount}] check(s) failed. Please review for solutions:" -ForegroundColor Red
+        if($script:emojiSupported) {
+            Write-Host "🚧 [${errorCount}] check(s) failed. Please review for solutions:" -ForegroundColor Red
+        } else {
+            Write-Host "`u{2736} [${errorCount}] check(s) did not succeed. Please review for solutions:" -ForegroundColor Red
+        }
         foreach ($collection in $CheckCollections) {
             $collection.ReportErrors()
         }

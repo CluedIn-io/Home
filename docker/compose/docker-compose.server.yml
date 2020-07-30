@@ -1,46 +1,47 @@
 version: '3.7'
 services:
-  cluedin:
+  server:
     image: cluedin/cluedin-server:${CLUEDIN_DOCKER_TAG}
     environment:
-      - CLUEDIN_appSettings__AgentServerUrl=http://localhost:9000
-      - CLUEDIN_appSettings__AuthReturnUrl=http://localhost:9001
+      - CLUEDIN_appSettings__AgentServerUrl=http://${CLUEDIN_DOMAIN}:9000
+      - CLUEDIN_appSettings__AuthReturnUrl=http://${CLUEDIN_DOMAIN}:9001
       - CLUEDIN_appSettings__AuthServerUrl=http://*:9001
       - CLUEDIN_appSettings__Domain=${CLUEDIN_DOMAIN}
       - CLUEDIN_appSettings__JobServerDashboardUrl=http://*:9003
       - CLUEDIN_appSettings__Notifications_AdminNotifications_Recipient=admin@foobar.com
       - CLUEDIN_appSettings__PublicServerUrl=http://*:9007
-      - CLUEDIN_appSettings__Seq_Url=${CLUEDIN_SEQ_URL}
+      - CLUEDIN_appSettings__Seq_Url=http://${CLUEDIN_SEQ_HOST:-seq}
       - CLUEDIN_appSettings__ServerBlobUrl=http://*:9000
       - CLUEDIN_appSettings__ServerPublicApiUrl=http://*:9007
-      - CLUEDIN_appSettings__ServerReturnUrl=http://localhost:9000
+      - CLUEDIN_appSettings__ServerReturnUrl=http://${CLUEDIN_DOMAIN}:9000
       - CLUEDIN_appSettings__ServerUrl=http://*:9000
       - CLUEDIN_appSettings__WebHookServerUrl=http://*:9006
       - CLUEDIN_appSettings__WebHookUrl=http://*:9006
-      - CLUEDIN_appSettings__WebhookReturnUrl=http://localhost:9006
+      - CLUEDIN_appSettings__WebhookReturnUrl=http://${CLUEDIN_DOMAIN}:9006
+      - CLUEDIN_appSettings__Feature_Clean_BaseUrl=http://${CLUEDIN_OPENREFINE_HOST:-openrefine}:3333/
 
-      - CLUEDIN_connectionStrings__CacheStore=redis:6379
-      - CLUEDIN_connectionStrings__DataProtectionPersistence=redis:6379
-      - CLUEDIN_connectionStrings__ETagStore=redis:6379
-      - CLUEDIN_connectionStrings__JobStore=redis:6379
+      - CLUEDIN_connectionStrings__CacheStore=${CLUEDIN_REDIS_HOST:-redis}:6379
+      - CLUEDIN_connectionStrings__DataProtectionPersistence=${CLUEDIN_REDIS_HOST:-redis}:6379
+      - CLUEDIN_connectionStrings__ETagStore=${CLUEDIN_REDIS_HOST:-redis}:6379
+      - CLUEDIN_connectionStrings__JobStore=${CLUEDIN_REDIS_HOST:-redis}:6379
 
-      - CLUEDIN_connectionStrings__GraphStore-Read=http://neo4j:@neo4j:7474/db/data
-      - CLUEDIN_connectionStrings__GraphStore-Write=http://neo4j:@neo4j:7474/db/data
+      - CLUEDIN_connectionStrings__GraphStore-Read=http://neo4j:@${CLUEDIN_NEO4J_HOST:-neo4j}:7474/db/data
+      - CLUEDIN_connectionStrings__GraphStore-Write=http://neo4j:@${CLUEDIN_NEO4J_HOST:-neo4j}:7474/db/data
 
-      - CLUEDIN_connectionStrings__MessageBus=host=rabbitmq;username=guest;password=guest;product=CluedIn
-      - CLUEDIN_connectionStrings__SearchStore=http://elasticsearch:9200
-      - CLUEDIN_connectionStrings__SignalRScaleOut=amqp://guest:guest@rabbitmq:5672
+      - CLUEDIN_connectionStrings__MessageBus=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=guest;password=guest;product=CluedIn
+      - CLUEDIN_connectionStrings__SearchStore=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
+      - CLUEDIN_connectionStrings__SignalRScaleOut=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
 
-      - CLUEDIN_connectionStrings__AuthenticationStore=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__BlobStorage=Data source=${CLUEDIN_DB_HOST};Initial catalog=DataStore.Db.BlobStorage;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__ConfigurationStore=Data source=${CLUEDIN_DB_HOST};Initial catalog=DataStore.Db.Configuration;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__CluedInEntities=Data source=${CLUEDIN_DB_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__TokenStore=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.TokenStore;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__Training=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.Training;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__ExternalSearch=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.ExternalSearch;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__Metrics=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.Metrics;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__ML-Logging=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_connectionStrings__WebAppStore=Data Source=${CLUEDIN_DB_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_DB_USER};Password=${CLUEDIN_DB_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__AuthenticationStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__BlobStorage=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.BlobStorage;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__ConfigurationStore=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.Configuration;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__CluedInEntities=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__TokenStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.TokenStore;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__Training=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Training;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__ExternalSearch=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ExternalSearch;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__Metrics=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Metrics;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__ML-Logging=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__WebAppStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_appSettings__Agent_Enabled=false
       - CLUEDIN_appSettings__Models_Enabled=false
       - DOTNET_Environment=${CLUEDIN_ENVIRONMENT}
@@ -52,11 +53,11 @@ services:
     volumes:
         - "./components:/components"
     ports:
-      - "9000:9000"
-      - "9001:9001"
-      - "9003:9003"
-      - "9006:9006"
-      - "9007:9007"
+      - "${CLUEDIN_SERVER_LOCALPORT:-9000}:9000"
+      - "${CLUEDIN_SERVER_AUTH_LOCALPORT:-9001}:9001"
+      - "${CLUEDIN_SERVER_JOB_LOCALPORT:-9003}:9003"
+      - "${CLUEDIN_SERVER_WEBHOOK_LOCALPORT:-9006}:9006"
+      - "${CLUEDIN_SERVER_PUBLIC_LOCALPORT:-9007}:9007"
     depends_on:
       - neo4j
       - elasticsearch

@@ -25,7 +25,7 @@ function Invoke-Environment {
 
         switch ($PSCmdlet.ParameterSetName) {
             'set' {
-                $env = (GetEnvironment $Name) ?? @{}
+                $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
                 $Set |
                     ParseEnvironmentEntry |
                     ForEach-Object {
@@ -46,21 +46,25 @@ function Invoke-Environment {
 
             }
             'unset' {
-                $env = (GetEnvironment $Name) ?? @{}
+                $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
                 foreach($rmKey in $Unset){
                     $foundKey = $env.Keys | Where-Object { $_ -eq $rmKey }
                     if($foundKey) {
-                        Write-Host "Unsetting '$($_.Key)' in '$Name' environment"
+                        Write-Host "Unsetting '$($foundKey)' in '$Name' environment"
                         $env.Remove($foundKey)
                     }
                 }
                 SetEnvironment $Name $env
             }
             'remove' {
+                if($Name -eq 'default'){
+                    Write-Host "You cannot remove the default environment."
+                    return
+                }
                 $env = FindEnvironment $Name
                 if($env) {
                     Write-Host "Removing '$Name' environment"
-                    Remove-Item $env
+                    Remove-Item $env -Recurse -Force
                 }
             }
         }
@@ -74,7 +78,7 @@ function FindEnvironment {
     )
 
     process {
-        Get-ChildItem ([Paths]::Env) -Filter "${Name}.env" -ErrorAction Ignore
+        Get-ChildItem ([Paths]::Env) -Filter "${Name}" -ErrorAction Ignore
     }
 }
 
@@ -85,17 +89,47 @@ function GetEnvironment {
     )
 
     $env = FindEnvironment $Name
+    if(!$env) { return $null}
+
+    $envPath = Join-Path $env '.env'
     $result = $null
 
-    if($env) {
+    if(Test-Path $envPath) {
         $result = [ordered]@{}
-        Get-Content $env |
+        Get-Content $envPath |
             ParseEnvironmentEntry |
             ForEach-Object { $result[$_.Key] = $_.Value }
-
     }
 
     $result
+}
+
+function GetEnvironmentValue {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+        [Parameter(Mandatory)]
+        [string]$Key,
+        [string]$DefaultValue = ''
+    )
+
+    $env = FindEnvironment $Name
+    $envPath = Join-Path $env '.env'
+
+    if(Test-Path $envPath) {
+        $found = Get-Content $envPath |
+                    ParseEnvironmentEntry |
+                    Where-Object { $_.Key -eq $Key }
+
+        $result = if($found) { $found.Value }
+
+        if(![string]::IsNullOrWhiteSpace($result)) {
+            return $result
+        } else {
+            return $DefaultValue
+        }
+    }
+    Write-Error "Could not find environment ${Env}";
 }
 
 function SetEnvironment {
@@ -106,10 +140,12 @@ function SetEnvironment {
         [hashtable]$Settings
     )
 
+    $rootPath = Join-Path ([Paths]::Env) $Name
+    if(-not (Test-Path $rootPath)) { New-Item $rootPath -ItemType Directory > $null }
     $Settings.GetEnumerator() |
         ForEach-Object { "$($_.Name)=$($_.Value)" } |
         Sort-Object |
-        Set-Content (Join-Path ([Paths]::Env) "${Name}.env")
+        Set-Content (Join-Path $rootPath '.env')
 }
 
 function ParseEnvironmentEntry {

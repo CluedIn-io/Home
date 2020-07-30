@@ -1,9 +1,13 @@
 function Test-Environment {
     [CmdletBinding()]
     [CluedInAction(Action = 'check', Header = 'Pre-Flight Check')]
-    param()
+    param(
+        [String]$Env = 'default'
+    )
 
-    $apps = [CheckCollection]::new('Installed Applications', @(
+    $cluedinDomain  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_DOMAIN' -DefaultValue 'localhost'
+
+    $appChecks = [CheckCollection]::new('Installed Applications', @(
         [Check]::new('PowerShell', {
             $message = "$($PSVersionTable.PSVersion) / $($PSVersionTable.PSEdition)"
             $success = $PSVersionTable.PSVersion.Major -ge 7 -and $PSVersionTable.PSEdition -eq 'Core'
@@ -20,27 +24,28 @@ function Test-Environment {
                 $message += " / $($info.Server.Components[0].Details.os)"
             }
             [CheckResult]::new($success, $message)
-        }, 'You must be running docker 19.0.0 or greater with linux containers enabled.')
+        }, 'Docker 19.0.0 or greater must be running with linux containers enabled.')
 
         [Check]::new('Docker Compose', {
             $info = docker-compose version --short
-            $success = ($info -replace '\..*', '') -ge 1
+            $major,$minor,$patch = $info.Trim().Split('.')
+            $success = ($major -ge 1) -and ($minor -ge 26)
             [CheckResult]::new($success, $info)
-        }, 'You must be running docker-compose 1.0.0 or greater.')
+        }, 'You must be running docker-compose 1.26.0 or greater.')
 
     ))
 
-    $ports = [CheckCollection]::new('Available Ports', @(
-        [PortCheck]::new('CluedIn Web', 80)
-        [PortCheck]::new('CluedIn API', 9000)
-        [PortCheck]::new('CluedIn Auth', 9001)
-        [PortCheck]::new('CluedIn Dashboard', 9003)
-        [PortCheck]::new('CluedIn WebHook', 9006)
-        [PortCheck]::new('CluedIn Public', 9007)
-        [PortCheck]::new('CluedIn WebApi', 9008)
+    $portChecks = [CheckCollection]::new('Available Ports', @(
+        [PortCheck]::new('CluedIn Web', 80, $cluedinDomain)
+        [PortCheck]::new('CluedIn API', 9000, $cluedinDomain)
+        [PortCheck]::new('CluedIn Auth', 9001, $cluedinDomain)
+        [PortCheck]::new('CluedIn Dashboard', 9003, $cluedinDomain)
+        [PortCheck]::new('CluedIn WebHook', 9006, $cluedinDomain)
+        [PortCheck]::new('CluedIn Public', 9007, $cluedinDomain)
+        [PortCheck]::new('CluedIn WebApi', 9008, $cluedinDomain)
     ))
 
-    $auth = [CheckCollection]::new('Authentication', @(
+    $authChecks = [CheckCollection]::new('Authentication', @(
             [Check]::new('Docker Registry',
                 @{ Registry = 'https://index.docker.io/v1/' },
                 {
@@ -52,18 +57,37 @@ function Test-Environment {
                 'You must be authorised for the specified registry.')
     ))
 
-    CheckReport $apps,$ports,$auth
+    $envChecks = [CheckCollection]::new('Environment', @(
+            [Check]::new('Docker - Memory', {
+                $rawMemory = docker system info -f '{{json .MemTotal}}' | ConvertFrom-Json
+                $intMemory = [Math]::Round($rawMemory / 1gb, 2)
+                $state = if($intMemory -ge 16) { [CheckResultState]::Success } else { [CheckResultState]::Warning }
+                $message = "${intMemory}gb available"
+                [CheckResult]::new($state, $message)
+            }, 'Docker should be configured with 16gb of available memory or more')
+            [Check]::new('Docker - CPU', {
+                $cpus = docker system info -f '{{json .NCPU}}' | ConvertFrom-Json
+                $state = if($cpus -ge 2) { [CheckResultState]::Success } else { [CheckResultState]::Warning }
+                $message = "${cpus} cpus available"
+                [CheckResult]::new($state, $message)
+            }, 'Docker should be configured with 2 cpus or more')
+    ))
+
+
+    CheckReport $appChecks,$portChecks,$authChecks,$envChecks
 }
 
 function Test-InstanceStatus {
     [CluedInAction(Action = 'status', Header = 'Status Check')]
     [CmdletBinding()]
     param(
-        [String]$Uri = 'http://localhost',
-        [Int]$Port = 9000
+        [String]$Env = 'default'
     )
 
-    $fullUri = "${Uri}:${Port}/status"
+    $domain  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_DOMAIN' -DefaultValue 'localhost'
+    $port  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_LOCALPORT' -DefaultValue '9000'
+
+    $fullUri = "http://${domain}:${Port}/status"
 
     # Get Response Data
     $response = $null
