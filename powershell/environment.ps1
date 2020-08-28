@@ -5,13 +5,20 @@ function Invoke-Environment {
     [CmdletBinding(DefaultParameterSetName='get')]
     [CluedInAction(Action = 'env', Header = 'Manage Environment')]
     param(
-        [Parameter(Position=0,ParameterSetName='set')]
-        [Parameter(Position=0,ParameterSetName='get')]
-        [Parameter(Position=0,ParameterSetName='unset')]
-        [Parameter(Position=0,ParameterSetName='remove')]
+        [Parameter(Position=0, ParameterSetName='set')]
+        [Parameter(Position=0, ParameterSetName='setTag')]
+        [Parameter(Position=0, ParameterSetName='get')]
+        [Parameter(Position=0, ParameterSetName='unset')]
+        [Parameter(Position=0, ParameterSetName='remove')]
         [string]$Name = 'default',
-        [Parameter(ParameterSetName='set',Mandatory)]
+        [Parameter(ParameterSetName='set', Mandatory)]
         [string[]]$Set,
+        [Parameter(ParameterSetName='set')]
+        [Parameter(ParameterSetName='setTag', Mandatory)]
+        [string]$Tag = [string]::Empty,
+        [Parameter(ParameterSetName='set')]
+        [Parameter(ParameterSetName='setTag')]
+        [string[]]$TagOverride = @(),
         [Parameter(ParameterSetName='get')]
         [switch]$Get,
         [Parameter(ParameterSetName='unset',Mandatory)]
@@ -24,14 +31,37 @@ function Invoke-Environment {
     process {
 
         switch ($PSCmdlet.ParameterSetName) {
-            'set' {
+            {$_ -in @('set', 'setTag')} {
                 $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
-                $Set |
-                    ParseEnvironmentEntry |
-                    ForEach-Object {
-                        Write-Host "Setting '$($_.Key)' in '$Name' environment"
-                        $env[$_.Key] = $_.Value
+
+                if($Set) {
+                    $Set |
+                        ParseEnvironmentEntry |
+                        ForEach-Object {
+                            Write-Host "Setting '$($_.Key)' in '$Name' environment"
+                            $env[$_.Key] = $_.Value
+                        }
+                }
+
+                if($Tag) {
+                    $keys = [string[]]::new($env.Keys.Count)
+                    $env.Keys.CopyTo($keys, 0)
+                    foreach ($key in $keys) {
+                        if($key -match 'CLUEDIN_(\w+)_TAG'){
+                            Write-Host "Setting '${key}' in '$Name' environment"
+                            $env[$key] = $Tag
+                        }
                     }
+                }
+
+                $TagOverride | ForEach-Object {
+                    $key,$value = $_ -split '='
+                    if($key -and $value) {
+                        $key = $key.ToUpper()
+                        Write-Host "Setting 'CLUEDIN_${key}_TAG' in '$Name' environment"
+                        $env["CLUEDIN_${key}_TAG"] = $value
+                    }
+                }
 
                 SetEnvironment $Name $env
             }
@@ -143,7 +173,7 @@ function SetEnvironment {
     $rootPath = Join-Path ([Paths]::Env) $Name
     if(-not (Test-Path $rootPath)) { New-Item $rootPath -ItemType Directory > $null }
     $Settings.GetEnumerator() |
-        ForEach-Object { "$($_.Name)=$($_.Value)" } |
+        ForEach-Object { "$($_.Name.ToUpper())=$($_.Value)" } |
         Sort-Object |
         Set-Content (Join-Path $rootPath '.env')
 }
@@ -168,4 +198,24 @@ function ParseEnvironmentEntry {
 
         $result
     }
+}
+
+function GetEnvironmentServiceTags {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
+
+    $env = GetEnvironment $Name
+    if(!$env) { return }
+
+    $envTags = @{}
+    $Env.GetEnumerator() | ForEach-Object {
+        if($_.Key -match 'CLUEDIN_(\w+)_TAG'){
+            #$envTags[$Matches[1]] = $_.Value
+            $envTags[$_.Key] = $_.Value
+        }
+    }
+
+    $envTags
 }

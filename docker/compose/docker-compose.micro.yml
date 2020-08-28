@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   clean:
-    image: cluedin/cluedin-micro-clean:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/cluedin-micro-clean:${CLUEDIN_CLEAN_TAG}
     environment:
     - RabbitMQ_CS=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
@@ -12,7 +12,7 @@ services:
     - DbPassword=${CLUEDIN_SQLSERVER_PASS}
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
     - DbName=${CLUEDIN_CLEAN_DBNAME:-DataStore.Db.MicroServices}
-    - ForceTableCreation=${CLUEDIN_CLEAN_FORCETABLECREATION:-true}
+    - ForceTableCreation=${CLUEDIN_CLEAN_FORCETABLECREATION:-false}
     ports:
       - "${CLUEDIN_CLEAN_LOCALPORT:-9009}:8888"
     depends_on:
@@ -21,9 +21,8 @@ services:
     - sqlserver
     - seq
 
-
   annotation:
-    image: cluedin/cluedin-micro-annotation:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
     environment:
     - RabbitMQ_CS=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
@@ -32,7 +31,7 @@ services:
     - DbName=${CLUEDIN_ANNOTATION_DBNAME:-DataStore.Db.MicroServices}
     - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
     - SeqLoggingLevel=debug
-    - ForceTableCreation=${CLUEDIN_ANNOTATION_FORCETABLECREATION:-true}
+    - ForceTableCreation=${CLUEDIN_ANNOTATION_FORCETABLECREATION:-false}
     ports:
       - "${CLUEDIN_ANNOTATION_LOCALPORT:-9010}:8888"
     depends_on:
@@ -42,7 +41,7 @@ services:
 
 
   datasource:
-    image: cluedin/cluedin-micro-datasource:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/cluedin-micro-datasource:${CLUEDIN_DATASOURCE_TAG}
     environment:
     - RabbitMQ_CS=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
@@ -54,7 +53,7 @@ services:
     - SeqLoggingLevel=debug
     - AnnotationURL=http://${CLUEDIN_ANNOTATION_HOST:-annotation}:${CLUEDIN_ANNOTATION_PORT:-8888}
     - ConsoleLoggingLevel=info
-    - ForceTableCreation=${CLUEDIN_DATASOURCE_FORCETABLECREATION:-true}
+    - ForceTableCreation=${CLUEDIN_DATASOURCE_FORCETABLECREATION:-false}
     ports:
       - "${CLUEDIN_DATASOURCE_LOCALPORT:-9011}:8888"
     depends_on:
@@ -65,7 +64,7 @@ services:
     - annotation
 
   submitter:
-    image: cluedin/cluedin-micro-submitter:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/cluedin-micro-submitter:${CLUEDIN_SUBMITTER_TAG}
     environment:
       CluedIn_API_URL: "http://${CLUEDIN_SERVER_HOST:-server}:9007/"
       RabbitMQ_URL: "amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"

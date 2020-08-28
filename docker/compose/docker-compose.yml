@@ -1,7 +1,7 @@
 version: '3.7'
 services:
     neo4j:
-        image: cluedin/neo4j:${CLUEDIN_DOCKER_TAG}
+        image: cluedin/neo4j:${CLUEDIN_NEO4J_TAG}
         environment:
             - NEO4J_AUTH=none
             - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
@@ -33,6 +33,6 @@ services:
             - "${CLUEDIN_SEQ_UI_LOCALPORT:-3200}:80"
             - "${CLUEDIN_SEQ_DATA_LOCALPORT:-5341}:5341"
     openrefine:
-        image: cluedin/openrefine:${CLUEDIN_DOCKER_TAG}
+        image: cluedin/openrefine:${CLUEDIN_OPENREFINE_TAG}
         ports:
             - "${CLUEDIN_OPENREFINE_LOCALPORT:-3333}:3333"

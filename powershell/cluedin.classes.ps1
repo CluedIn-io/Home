@@ -54,7 +54,11 @@ class CheckResult {
                 }
             }
         }
-        Write-Host " `u{00BB} $($this.Name) : $($this.Details)"
+        $line = " `u{00BB} $($this.Name)"
+        if($this.Details) {
+            $line += " : $($this.Details)"
+        }
+        Write-Host $line
     }
 }
 
@@ -100,7 +104,7 @@ class PortCheck : Check {
     [String]$Domain = 'localhost'
 
     PortCheck([String]$Name, [Int]$Port, [String]$Domain) : base($Name, {
-            $info = Test-Connection -ComputerName $args[0].Domain -TcpPort $args[0].Port -WarningAction Ignore
+            $info = Test-Connection -ComputerName $args[0].Domain -TcpPort $args[0].Port -WarningAction Ignore -TimeoutSeconds 1
             $success = -not [Boolean]::Parse($info)
             [CheckResult]::new($success, "$($args[0].Domain):$($args[0].Port)")
         }, "The specified port must be available." ) {

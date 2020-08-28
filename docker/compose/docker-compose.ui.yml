@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   ui:
-    image: cluedin/ui:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/ui:${CLUEDIN_UI_TAG}
     ports:
     - "${CLUEDIN_UI_LOCALPORT:-80}:80"
     environment:
@@ -21,7 +21,7 @@ services:
     - server
 
   gql:
-    image: cluedin/cluedin-ui-gql:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/cluedin-ui-gql:${CLUEDIN_GQL_TAG}
     environment:
         - "AUTH_API=http://${CLUEDIN_SERVER_HOST:-server}:9001/"
         - "WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/"

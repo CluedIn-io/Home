@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   server:
-    image: cluedin/cluedin-server:${CLUEDIN_DOCKER_TAG}
+    image: cluedin/cluedin-server:${CLUEDIN_SERVER_TAG}
     environment:
       - CLUEDIN_appSettings__AgentServerUrl=http://${CLUEDIN_DOMAIN}:9000
       - CLUEDIN_appSettings__AuthReturnUrl=http://${CLUEDIN_DOMAIN}:9001

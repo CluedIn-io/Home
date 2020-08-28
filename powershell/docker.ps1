@@ -7,7 +7,8 @@ function DockerCompose {
         [String]$Action,
         [String]$Env = 'default',
         [String]$AdditionalArgs = [string]::Empty,
-        [String]$Tag,
+        [String]$Tag = [string]::Empty,
+        [String[]]$TagOverride = @(),
         [String[]]$Disable = @()
     )
 
@@ -32,7 +33,17 @@ function DockerCompose {
     Write-Verbose "[docker]: $compose"
     $envVars = @{}
     if($Tag){
-        $envVars.CLUEDIN_DOCKER_TAG = $Tag
+        $envTags = GetEnvironmentServiceTags -Name $Env
+        $envTags.GetEnumerator() | ForEach-Object {
+            $envVars[$_.Key] = $Tag
+        }
+    }
+
+    $TagOverride | ForEach-Object {
+        $key,$value = $_ -split '='
+        if($key -and $value) {
+            $envVars["CLUEDIN_${key}_TAG"] = $value
+        }
     }
 
     $envContext = Set-Environment $envVars
@@ -54,7 +65,8 @@ function Invoke-DockerCompose {
         [Parameter(Mandatory)]
         [String]$Action,
         [String]$Env = 'default',
-        [String]$Tag
+        [String]$Tag,
+        [String[]]$TagOverride = @()
     )
 
     <# This is jsut a proxy function so DockerCompose does not leak intenal parameters #>
@@ -68,6 +80,7 @@ function Invoke-DockerComposeUp {
     param(
         [String]$Env = 'default',
         [String]$Tag,
+        [String[]]$TagOverride = @(),
         [String[]]$Disable,
         [Switch]$Pull
     )

@@ -39,5 +39,5 @@ process {
 }
 
 end {
-    Remove-Module -ModuleInfo $importedModule
+    Remove-Module -ModuleInfo $importedModule -Verbose:$false
 }
