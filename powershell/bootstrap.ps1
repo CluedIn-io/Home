@@ -11,7 +11,7 @@ function Invoke-CreateOrg {
         [string]$Pass = "P@ssword!123"
     )
 
-    $serverPort  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_LOCALPORT' -DefaultValue '9001'
+    $serverPort  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_AUTH_LOCALPORT' -DefaultValue '9001'
 
     $requestArgs = @{
         Method = 'POST'
