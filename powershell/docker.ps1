@@ -25,8 +25,8 @@ function DockerCompose {
 
     $compose = "docker-compose $projectName $composeFiles $envPath $action"
 
-    $disableFags = $Disable | Where-Object { $_ } | ForEach-Object { "--scale ${_}=0" }
-    if($disableFags) { $compose += " ${disableFags}" }
+    $disableFlags = $Disable | Where-Object { $_ } | ForEach-Object { "--scale ${_}=0" }
+    if($disableFlags) { $compose += " ${disableFlags}" }
 
     if($AdditionalArgs) { $compose += " ${AdditionalArgs}" }
 

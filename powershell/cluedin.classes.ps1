@@ -197,7 +197,7 @@ class EnvironmentToggle {
             else { $current = $current.Value }
             $this.Container[$Variable] = $current
         }
-        Set-Item $path $Value
+        Set-Item $path.ToUpper() $Value
     }
 
     [void] Reset() {

@@ -42,7 +42,7 @@ services:
       - CLUEDIN_connectionStrings__Metrics=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Metrics;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__ML-Logging=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__WebAppStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_appSettings__Agent_Enabled=false
+      - CLUEDIN_appSettings__Agent_Enabled=true
       - CLUEDIN_appSettings__Models_Enabled=false
       - DOTNET_Environment=${CLUEDIN_ENVIRONMENT}
       - CLUEDIN_appSettings__EmailUserName=${CLUEDIN_EMAIL_USER}
@@ -50,8 +50,11 @@ services:
       - CLUEDIN_appSettings__EmailServer=${CLUEDIN_EMAIL_HOST}
       - CLUEDIN_appSettings__EmailPort=${CLUEDIN_EMAIL_PORT}
       - CLUEDIN_appSettings__EmailSender=${CLUEDIN_EMAIL_SENDER}
+      - CLUEDIN_appSettings__EmailDirectory=${CLUEDIN_EMAIL_DIR:-}
+      - CLUEDIN_appSettings__JobServer_DashboardVisible=${CLUEDIN_JOBS_DASHBOARD:-localOnly}
     volumes:
         - "./components:/components"
+        - ".${CLUEDIN_EMAIL_DIR:-}:/app/${CLUEDIN_EMAIL_DIR:-emails}"
     ports:
       - "${CLUEDIN_SERVER_LOCALPORT:-9000}:9000"
       - "${CLUEDIN_SERVER_AUTH_LOCALPORT:-9001}:9001"

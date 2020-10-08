@@ -8,7 +8,8 @@ function Invoke-CreateOrg {
         [string]$Name,
         [ValidatePattern("^[a-zA-Z0-9.!#$%&*+\/=?^_{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")]
         [string]$Email = "admin@${Name}.com",
-        [string]$Pass = "P@ssword!123"
+        [string]$Pass = "P@ssword!123",
+        [switch]$AllowEmailSignup = $false
     )
 
     $serverPort  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_AUTH_LOCALPORT' -DefaultValue '9001'
@@ -22,7 +23,7 @@ function Invoke-CreateOrg {
         }
         Body = @{
             grant_type = 'password'
-            allowEmailDomainSignup = 'false'
+            allowEmailDomainSignup = $AllowEmailSignup
             username = $Email
             email = $Email
             password = $Pass
@@ -41,8 +42,19 @@ function Invoke-CreateOrg {
     } catch {
         $success = $false
         Write-Host "Create organization was not successful"
-        if($_.ErrorDetails.Message) {
-            ($_.ErrorDetails.Message | ConvertFrom-Json).password.'$values'
+        $ex = $_
+        if($ex.ErrorDetails.Message) {
+            try {
+                $json = $_.ErrorDetails.Message | ConvertFrom-Json
+                $json.psobject.members.name |
+                    ForEach-Object {
+                        if($json.$_.psobject.members.name -contains '$values') {
+                            $json.$_.'$values'
+                        }
+                    }
+            } catch {
+                Write-Host $ex.ErrorDetails.Message
+            }
         }
     } finally {
         If($success) {
