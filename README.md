@@ -261,7 +261,7 @@ This sub-command prints the current version information for this script.
 | datasource    | 9011       | 8888          | DataSource API          |
 | submitter     | 9012       | 8888          | Submitter API           |
 | gql           | 8888       | 8888          | GraphQL                 |
-| ui            | 80         | 80            | UI/System Entrypoint    |
+| ui            | 9080       | 80            | UI/System Entrypoint    |
 | neo4j         | 7474       | 7474          | Neo4J Data              |
 |               | 7687       | 7687          | Neo4J Bolt              |
 | elasticsearch | 9200       | 9200          | ElasticSearch Data      |

@@ -26,7 +26,7 @@ services:
         ports:
             - "${CLUEDIN_REDIS_LOCALPORT:-6379}:6379"
     seq:
-        image: datalust/seq:5
+        image: datalust/seq:latest
         environment:
             ACCEPT_EULA: 'Y'
         ports:

@@ -13,6 +13,9 @@ services:
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
     - DbName=${CLUEDIN_CLEAN_DBNAME:-DataStore.Db.MicroServices}
     - ForceTableCreation=${CLUEDIN_CLEAN_FORCETABLECREATION:-false}
+    - AnnotationURL=http://${CLUEDIN_ANNOTATION_HOST:-annotation}:${CLUEDIN_ANNOTATION_PORT:-8888}
+    - DataSourceURL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-8888}
+    - NODE_ENV=${CLUEDIN_ENVIRONMENT}
     ports:
       - "${CLUEDIN_CLEAN_LOCALPORT:-9009}:8888"
     depends_on:
@@ -20,6 +23,8 @@ services:
     - rabbitmq
     - sqlserver
     - seq
+    - annotation
+    - datasource
 
   annotation:
     image: cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
@@ -32,6 +37,7 @@ services:
     - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
     - SeqLoggingLevel=debug
     - ForceTableCreation=${CLUEDIN_ANNOTATION_FORCETABLECREATION:-false}
+    - NODE_ENV=${CLUEDIN_ENVIRONMENT}
     ports:
       - "${CLUEDIN_ANNOTATION_LOCALPORT:-9010}:8888"
     depends_on:
@@ -54,6 +60,7 @@ services:
     - AnnotationURL=http://${CLUEDIN_ANNOTATION_HOST:-annotation}:${CLUEDIN_ANNOTATION_PORT:-8888}
     - ConsoleLoggingLevel=info
     - ForceTableCreation=${CLUEDIN_DATASOURCE_FORCETABLECREATION:-false}
+    - NODE_ENV=${CLUEDIN_ENVIRONMENT}
     ports:
       - "${CLUEDIN_DATASOURCE_LOCALPORT:-9011}:8888"
     depends_on:

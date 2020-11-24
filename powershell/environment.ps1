@@ -10,6 +10,7 @@ function Invoke-Environment {
         [Parameter(Position=0, ParameterSetName='get')]
         [Parameter(Position=0, ParameterSetName='unset')]
         [Parameter(Position=0, ParameterSetName='remove')]
+        [Parameter(Position=0, ParameterSetName='setTagOverride')]
         [string]$Name = 'default',
         [Parameter(ParameterSetName='set', Mandatory)]
         [string[]]$Set,
@@ -18,6 +19,7 @@ function Invoke-Environment {
         [string]$Tag = [string]::Empty,
         [Parameter(ParameterSetName='set')]
         [Parameter(ParameterSetName='setTag')]
+        [Parameter(ParameterSetName='setTagOverride', Mandatory)]
         [string[]]$TagOverride = @(),
         [Parameter(ParameterSetName='get')]
         [switch]$Get,
@@ -31,7 +33,7 @@ function Invoke-Environment {
     process {
 
         switch ($PSCmdlet.ParameterSetName) {
-            {$_ -in @('set', 'setTag')} {
+            {$_ -in @('set', 'setTag', 'setTagOverride')} {
                 $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
 
                 if($Set) {
