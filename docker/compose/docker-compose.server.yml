@@ -33,6 +33,7 @@ services:
       - CLUEDIN_connectionStrings__SignalRScaleOut=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
 
       - CLUEDIN_connectionStrings__AuthenticationStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_connectionStrings__AuditLog=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.AuditLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__BlobStorage=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.BlobStorage;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__ConfigurationStore=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.Configuration;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__CluedInEntities=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
@@ -42,7 +43,7 @@ services:
       - CLUEDIN_connectionStrings__Metrics=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Metrics;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__ML-Logging=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__WebAppStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_appSettings__Agent_Enabled=false
+      - CLUEDIN_appSettings__Agent_Enabled=${CLUEDIN_AGENT_ENABLED}
       - CLUEDIN_appSettings__Models_Enabled=false
       - DOTNET_Environment=${CLUEDIN_ENVIRONMENT}
       - CLUEDIN_appSettings__EmailUserName=${CLUEDIN_EMAIL_USER}
