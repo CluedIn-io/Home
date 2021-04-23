@@ -7,13 +7,13 @@ function Invoke-Open {
         [String]$Org = 'app'
     )
 
-    $env = GetEnvironment -Name $Env
-    if(!$env) {
+    $envDetails = GetEnvironment -Name $Env
+    if(!$envDetails) {
         throw "Environment ${Env} could not be found"
     }
 
-    $port  = $env.CLUEDIN_UI_LOCALPORT ?? '9080'
-    $domain = $env.CLUEDIN_DOMAIN ?? '127.0.0.1.xip.io'
+    $port  = $envDetails.CLUEDIN_UI_LOCALPORT ?? '9080'
+    $domain = $envDetails.CLUEDIN_DOMAIN ?? '127.0.0.1.xip.io'
     $address = "http://${Org}.${domain}:${port}"
     Start-Process $address
 }

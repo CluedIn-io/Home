@@ -5,12 +5,12 @@ function Test-Environment {
         [String]$Env = 'default'
     )
 
-    $env = GetEnvironment -Name $Env
-    if(!$env) {
+    $envDetails = GetEnvironment -Name $Env
+    if(!$envDetails) {
         throw "Environment ${Env} could not be found"
     }
 
-    $cluedinDomain = $env.CLUEDIN_DOMAIN ?? 'localhost'
+    $cluedinDomain = $envDetails.CLUEDIN_DOMAIN ?? 'localhost'
 
     $appChecks = [CheckCollection]::new('Installed Applications', @(
         [Check]::new('PowerShell', {
@@ -41,29 +41,29 @@ function Test-Environment {
     ))
 
     $portChecks = [CheckCollection]::new('Available Ports', @(
-        [PortCheck]::new('CluedIn UI', $env.CLUEDIN_UI_LOCALPORT ?? 9080, $cluedinDomain)
-        [PortCheck]::new('CluedIn API', $env.CLUEDIN_SERVER_LOCALPORT ?? 9000, $cluedinDomain)
-        [PortCheck]::new('CluedIn Auth', $env.CLUEDIN_SERVER_AUTH_LOCALPORT ?? 9001, $cluedinDomain)
-        [PortCheck]::new('CluedIn Jobs', $env.CLUEDIN_SERVER_JOB_LOCALPORT ?? 9003, $cluedinDomain)
-        [PortCheck]::new('CluedIn WebHooks', $env.CLUEDIN_SERVER_WEBHOOK_LOCALPORT ?? 9006, $cluedinDomain)
-        [PortCheck]::new('CluedIn Public', $env.CLUEDIN_SERVER_PUBLIC_LOCALPORT ?? 9007, $cluedinDomain)
-        [PortCheck]::new('CluedIn Web Api', $env.CLUEDIN_WEBAPI_LOCALPORT ?? 9008, $cluedinDomain)
-        [PortCheck]::new('CluedIn Clean', $env.CLUEDIN_CLEAN_LOCALPORT ?? 9009, $cluedinDomain)
-        [PortCheck]::new('CluedIn Annotation', $env.CLUEDIN_ANNOTATION_LOCALPORT ?? 9010, $cluedinDomain)
-        [PortCheck]::new('CluedIn Datasource', $env.CLUEDIN_DATASOURCE_LOCALPORT ?? 9011, $cluedinDomain)
-        [PortCheck]::new('CluedIn Submitter', $env.CLUEDIN_SUBMITTER_LOCALPORT ?? 9012, $cluedinDomain)
-        [PortCheck]::new('CluedIn Gql', $env.CLUEDIN_GQL_LOCALPORT ?? 8888, $cluedinDomain)
-        [PortCheck]::new('Neo4j Http', $env.CLUEDIN_NEO4J_HTTP_LOCALPORT ?? 7474, 'localhost')
-        [PortCheck]::new('Neo4j Bolt', $env.CLUEDIN_NEO4J_BOLT_LOCALPORT ?? 7687, 'localhost')
-        [PortCheck]::new('Elasticsearch Data', $env.CLUEDIN_ELASTIC_DATA_LOCALPORT ?? 9200, 'localhost')
-        [PortCheck]::new('Elasticsearch Http', $env.CLUEDIN_ELASTIC_HTTP_LOCALPORT ?? 9300, 'localhost')
-        [PortCheck]::new('RabbitMQ Data', $env.CLUEDIN_RABBITMQ_DATA_LOCALPORT ?? 5672, 'localhost')
-        [PortCheck]::new('RabbitMQ Http', $env.CLUEDIN_RABBITMQ_HTTP_LOCALPORT ?? 15672, 'localhost')
-        [PortCheck]::new('Redis', $env.CLUEDIN_REDIS_LOCALPORT ?? 6379, 'localhost')
-        [PortCheck]::new('Seq UI', $env.CLUEDIN_SEQ_UI_LOCALPORT ?? 3200, 'localhost')
-        [PortCheck]::new('Seq Data', $env.CLUEDIN_SEQ_DATA_LOCALPORT ?? 5341, 'localhost')
-        [PortCheck]::new('Sql Server', $env.CLUEDIN_SQLSERVER_LOCALPORT ?? 1433, 'localhost')
-        [PortCheck]::new('OpenRefine', $env.CLUEDIN_OPENREFINE_LOCALPORT ?? 3333, 'localhost')
+        [PortCheck]::new('CluedIn UI', $envDetails.CLUEDIN_UI_LOCALPORT ?? 9080, $cluedinDomain)
+        [PortCheck]::new('CluedIn API', $envDetails.CLUEDIN_SERVER_LOCALPORT ?? 9000, $cluedinDomain)
+        [PortCheck]::new('CluedIn Auth', $envDetails.CLUEDIN_SERVER_AUTH_LOCALPORT ?? 9001, $cluedinDomain)
+        [PortCheck]::new('CluedIn Jobs', $envDetails.CLUEDIN_SERVER_JOB_LOCALPORT ?? 9003, $cluedinDomain)
+        [PortCheck]::new('CluedIn WebHooks', $envDetails.CLUEDIN_SERVER_WEBHOOK_LOCALPORT ?? 9006, $cluedinDomain)
+        [PortCheck]::new('CluedIn Public', $envDetails.CLUEDIN_SERVER_PUBLIC_LOCALPORT ?? 9007, $cluedinDomain)
+        [PortCheck]::new('CluedIn Web Api', $envDetails.CLUEDIN_WEBAPI_LOCALPORT ?? 9008, $cluedinDomain)
+        [PortCheck]::new('CluedIn Clean', $envDetails.CLUEDIN_CLEAN_LOCALPORT ?? 9009, $cluedinDomain)
+        [PortCheck]::new('CluedIn Annotation', $envDetails.CLUEDIN_ANNOTATION_LOCALPORT ?? 9010, $cluedinDomain)
+        [PortCheck]::new('CluedIn Datasource', $envDetails.CLUEDIN_DATASOURCE_LOCALPORT ?? 9011, $cluedinDomain)
+        [PortCheck]::new('CluedIn Submitter', $envDetails.CLUEDIN_SUBMITTER_LOCALPORT ?? 9012, $cluedinDomain)
+        [PortCheck]::new('CluedIn Gql', $envDetails.CLUEDIN_GQL_LOCALPORT ?? 8888, $cluedinDomain)
+        [PortCheck]::new('Neo4j Http', $envDetails.CLUEDIN_NEO4J_HTTP_LOCALPORT ?? 7474, 'localhost')
+        [PortCheck]::new('Neo4j Bolt', $envDetails.CLUEDIN_NEO4J_BOLT_LOCALPORT ?? 7687, 'localhost')
+        [PortCheck]::new('Elasticsearch Data', $envDetails.CLUEDIN_ELASTIC_DATA_LOCALPORT ?? 9200, 'localhost')
+        [PortCheck]::new('Elasticsearch Http', $envDetails.CLUEDIN_ELASTIC_HTTP_LOCALPORT ?? 9300, 'localhost')
+        [PortCheck]::new('RabbitMQ Data', $envDetails.CLUEDIN_RABBITMQ_DATA_LOCALPORT ?? 5672, 'localhost')
+        [PortCheck]::new('RabbitMQ Http', $envDetails.CLUEDIN_RABBITMQ_HTTP_LOCALPORT ?? 15672, 'localhost')
+        [PortCheck]::new('Redis', $envDetails.CLUEDIN_REDIS_LOCALPORT ?? 6379, 'localhost')
+        [PortCheck]::new('Seq UI', $envDetails.CLUEDIN_SEQ_UI_LOCALPORT ?? 3200, 'localhost')
+        [PortCheck]::new('Seq Data', $envDetails.CLUEDIN_SEQ_DATA_LOCALPORT ?? 5341, 'localhost')
+        [PortCheck]::new('Sql Server', $envDetails.CLUEDIN_SQLSERVER_LOCALPORT ?? 1433, 'localhost')
+        [PortCheck]::new('OpenRefine', $envDetails.CLUEDIN_OPENREFINE_LOCALPORT ?? 3333, 'localhost')
     ))
 
     $authChecks = [CheckCollection]::new('Authentication', @(

@@ -238,6 +238,44 @@ Usage: (`up` with a local environment)
 pwsh cluedin.ps1 up -env local
 ```
 
+### Package Installation
+
+Package installation enables selective download and installation of integration packages for the CluedIn
+service through the _nuget-installer_ docker image.  Installation is managed per environment, so unique package configurations can be tested.
+
+1. The `packages` command is the root command for all package functionality.
+1. By default the list of packages to be installed is displayed: `cluedin.ps1 packages`
+1. A package may be added with an optional version: `cluedin.ps1 packages -add <packagename> -version <version>`
+    + If no version is supplied the latest version will be installed.
+    + Package versions may be specified using nuget [floating version] semantics.
+1. A package may be removed: `cluedin.ps1 packages -remove <packagename>`
+1. Feeds may be added with optional credentials: `cluedin.ps1 -addfeed <feedname> -uri <uri> -user <username> -pass <password>`
+    + Nuget.org is pre-configured in the installation image.
+    + A default folder is also configured for installation of local packages _/\<env>/packages/local_.
+1. Feeds may be removed: `cluedin.ps1 -removefeed <feedname>`
+1. After configuration, packages may be restored ready for installation: `cluedin.ps1 packages -restore`
+1. Previously restored packages may be cleaned from disk: `cluedin.ps1 packages -clean`
+1. The image used for package installation and configuration can be specified with the `-tag` parameter when using `-addfeed`, `-removefeed`, or `-restore`.
+    + Additionally the `-pull` flag can be specified to pull that image
+1. **ALL** `package` commands may also specify an environment to apply the changes to that specific environment. E.g. `cluedin.ps1 packages custom -add My.Custom.Package` will add the package to the `custom` environment.
+    + The `default` environment is used if none is specified
+
+> When building local packages you can copy the created nuget package to _/\<env>/packages/local_ and add the package name with `cluedin.ps1 packages -add <name>`. This removes the requirement to publish the package to a custom feed.
+
+#### Examples
+```bash
+pwsh ./cluedin.ps1 packages -add Cluedin.Crawling.HubSpot #=> Configures the package for installation with the latest version
+pwsh ./cluedin.ps1 packages -addfeed cluedin -uri <cluedinfeed> -user <username> -pass <password> #=> Configures the feed to download packages
+pwsh ./cluedin.ps1 packages -restore #=> Restores packages for the environment
+pwsh ./cluedin.ps1 up #=> Starts the environments with the packages
+
+# The following completes the same actions as above, but for a specific environment
+pwsh ./cluedin.ps1 packages custom -add Cluedin.Crawling.HubSpot
+pwsh ./cluedin.ps1 packages custom -addfeed cluedin -uri <cluedinfeed> -user <username> -pass <password>
+pwsh ./cluedin.ps1 packages custom -restore
+pwsh ./cluedin.ps1 custom up
+```
+
 ### Version
 
 ```bash

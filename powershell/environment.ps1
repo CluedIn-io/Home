@@ -192,7 +192,7 @@ function ParseEnvironmentEntry {
         if($Entry -match '^(?<key>[^=]+)=(?<value>.*)$'){
             $result = @{
                 Key = $Matches['key'].ToUpper()
-                Value = $Matches['value']
+                Value = if ([string]::IsNullOrEmpty($Matches['value'])) { $null } else { $Matches['value'] }
             }
         } else {
             throw "Invalid environment entry $entry"

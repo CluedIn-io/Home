@@ -15,7 +15,7 @@ services:
         - LegacyEndpoints__Auth__BaseUri=http://${CLUEDIN_SERVER_HOST:-server}:9001
         - LegacyEndpoints__Auth__Endpoints__Token=connect/token
         - EmailSettings__AppSubdomain=app
-        - EmailSettings__AppUrl=http://app.${CLUEDIN_DOMAIN}
+        - EmailSettings__AppUrl=http://app.${CLUEDIN_DOMAIN}:${CLUEDIN_UI_LOCALPORT:-9080}
         - EmailSettings__SmtpHost=${CLUEDIN_EMAIL_HOST}
         - EmailSettings__SmtpPort=${CLUEDIN_EMAIL_PORT}
         - EmailSettings__FromAddress=${CLUEDIN_EMAIL_SENDER}
