@@ -13,7 +13,7 @@ function Invoke-Open {
     }
 
     $port  = $envDetails.CLUEDIN_UI_LOCALPORT ?? '9080'
-    $domain = $envDetails.CLUEDIN_DOMAIN ?? '127.0.0.1.xip.io'
+    $domain = $envDetails.CLUEDIN_DOMAIN ?? '127.0.0.1.nip.io'
     $address = "http://${Org}.${domain}:${port}"
     Start-Process $address
 }

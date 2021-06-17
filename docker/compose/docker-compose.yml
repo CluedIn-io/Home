@@ -20,6 +20,9 @@ services:
         ports:
             - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
             - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
+        environment:
+            - RABBITMQ_DEFAULT_USER=${CLUEDIN_RABBITMQ_USERNAME:-guest}
+            - RABBITMQ_DEFAULT_PASS=${CLUEDIN_RABBITMQ_PASSWORD:-guest}
         hostname: cluedin-dev
     redis:
         image: redis:5.0-alpine

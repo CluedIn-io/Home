@@ -182,7 +182,7 @@ function Invoke-Packages {
         }
         'restore' {
             $envFile = Join-Path $envPath '.env'
-            $runCmd = "docker run --rm -a stdout -a stderr -v '${components}:/components' -v '${packages}:/packages' --env-file $envFile $image"
+            $runCmd = "docker run --rm -a stdout -a stderr -v '${components}:/components' -v '${packages}:/packages' --env-file '$envFile' $image"
             Write-Verbose "[docker]: $runCmd"
             Invoke-Expression $runCmd
         }

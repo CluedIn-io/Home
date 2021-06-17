@@ -32,7 +32,7 @@ docker login
 
 pwsh cluedin.ps1 up
 
-open http://app.127.0.0.1.xip.io
+open http://app.127.0.0.1.nip.io
 ```
 
 ## Using the Docker helper script

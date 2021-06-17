@@ -12,7 +12,7 @@ function DockerCompose {
         [String[]]$Disable = @()
     )
 
-    $envPath = $Env | FindEnvironment | ForEach-Object { "--project-directory $($_.FullName)" }
+    $envPath = $Env | FindEnvironment | ForEach-Object { "--project-directory '$($_.FullName)'" }
     if(-not $envPath) {
         Write-Host "Could not find environment ${Env}"
         return
@@ -21,7 +21,7 @@ function DockerCompose {
     $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
 
     $projectName = "-p cluedin_$($Env.ToLowerInvariant())"
-    $composeFiles = Get-ChildItem $composeRoot -Filter 'docker-compose*.yml' | ForEach-Object { "-f $($_.FullName)" }
+    $composeFiles = Get-ChildItem $composeRoot -Filter 'docker-compose*.yml' | ForEach-Object { "-f '$($_.FullName)'" }
 
     $compose = "docker-compose $projectName $composeFiles $envPath $action"
 

@@ -31,9 +31,9 @@ services:
       - CLUEDIN_connectionStrings__GraphStore-Read=http://neo4j:@${CLUEDIN_NEO4J_HOST:-neo4j}:7474/db/data
       - CLUEDIN_connectionStrings__GraphStore-Write=http://neo4j:@${CLUEDIN_NEO4J_HOST:-neo4j}:7474/db/data
 
-      - CLUEDIN_connectionStrings__MessageBus=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=guest;password=guest;product=CluedIn
+      - CLUEDIN_connectionStrings__MessageBus=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=${CLUEDIN_RABBITMQ_USERNAME:-guest};password=${CLUEDIN_RABBITMQ_PASSWORD:-guest};product=CluedIn
       - CLUEDIN_connectionStrings__SearchStore=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
-      - CLUEDIN_connectionStrings__SignalRScaleOut=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+      - CLUEDIN_connectionStrings__SignalRScaleOut=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
 
       - CLUEDIN_connectionStrings__AuthenticationStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_connectionStrings__AuditLog=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.AuditLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True

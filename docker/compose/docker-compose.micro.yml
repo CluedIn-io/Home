@@ -3,7 +3,7 @@ services:
   clean:
     image: cluedin/cluedin-micro-clean:${CLUEDIN_CLEAN_TAG}
     environment:
-    - RabbitMQ_CS=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
     - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
     - SeqLoggingLevel=debug
@@ -29,7 +29,7 @@ services:
   annotation:
     image: cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
     environment:
-    - RabbitMQ_CS=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
     - DbPassword=${CLUEDIN_SQLSERVER_PASS}
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
@@ -49,7 +49,7 @@ services:
   datasource:
     image: cluedin/cluedin-micro-datasource:${CLUEDIN_DATASOURCE_TAG}
     environment:
-    - RabbitMQ_CS=amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
     - DbName=${CLUEDIN_DATASOURCE_DBNAME:-DataStore.Db.MicroServices}
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
@@ -74,7 +74,7 @@ services:
     image: cluedin/cluedin-micro-submitter:${CLUEDIN_SUBMITTER_TAG}
     environment:
       CluedIn_API_URL: "http://${CLUEDIN_SERVER_HOST:-server}:9007/"
-      RabbitMQ_URL: "amqp://guest:guest@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
+      RabbitMQ_URL: "amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
       Serilog__WriteTo__1__Name: Seq
       Serilog__WriteTo__1__Args__serverUrl: http://${CLUEDIN_SEQ_HOST:-seq}:5341
       # needs $$ to escape the dollar sign
