@@ -1,0 +1,4 @@
+# Additional config required to get docker working properly for local testing
+# This might look wrong but bear in mind this ends up on the public site
+repository: Cluedin-io/Home
+url: http://localhost:4000

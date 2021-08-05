@@ -1,0 +1,19 @@
+title: "CluedIn"
+#TODO Get a better logo
+#logo: "/assets/images/logo.png"
+remote_theme: "pmarsceill/just-the-docs"
+color_scheme: "cluedin"
+permalink: pretty
+
+search_enabled: true
+search:
+  button: false
+
+aux_links_new_tab: true
+aux_links:
+  "Home on GitHub":
+    - "https://github.com/cluedin-io/Home"
+  "CluedIn":
+    - "https://cluedin.com"
+
+gh_edit_link: false
