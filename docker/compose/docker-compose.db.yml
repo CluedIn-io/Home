@@ -5,3 +5,8 @@ services:
         entrypoint: ["sh","-c","/init/init.sh"]
         ports:
             - "${CLUEDIN_SQLSERVER_LOCALPORT:-1433}:1433"
+        volumes:
+            - type: bind
+              source: ./data/sqlserver/data
+              target: /var/opt/mssql/data
+

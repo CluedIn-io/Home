@@ -31,7 +31,7 @@ begin {
 
 process {
     if(-not $ciAction) {
-        Write-Error "Unrecognised action: $Action"
+        Write-Error "Unrecognized action: $Action"
     } else {
         Write-Output $ciAction.Header
         & $ciAction.Command @PSBoundParameters

@@ -178,6 +178,7 @@ function CheckReport {
 class CluedInAction : Attribute {
     [string]$Action = @()
     [string]$Header = [string]::Empty
+    [string]$Context = "docker"
 }
 
 class EnvironmentToggle {
@@ -211,5 +212,23 @@ class EnvironmentToggle {
 }
 
 class Paths {
-    static [string]$Env = (Get-Item ([Path]::Combine($PSScriptRoot, 'env'))).FullName
+    static [string]$Env
+    static [string]$ClusterEnv
+    static [string]$TerraformScripts
+
+    static [string] EnvironmentForContext([string] $context) {
+        $result = switch ($context) {
+            docker { [Paths]::Env }
+            cluster { [Paths]::ClusterEnv }
+            default {
+                throw "Unknown context '$context'"
+            }
+        }
+
+        return $result
+    }
+
+    static [void] InitPaths([string] $scriptsDir) {
+        [Paths]::Env              = (Get-Item ([Path]::Combine($scriptsDir, '..', 'env'))).FullName
+    }
 }

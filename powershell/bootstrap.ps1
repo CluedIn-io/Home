@@ -1,9 +1,19 @@
 function Invoke-Open {
+    <#
+        .SYNOPSIS
+        Opens CluedIn.
+
+        .DESCRIPTION
+        Starts CluedIn in the default browser using the environments configured
+        host/port information.
+    #>
     [CluedInAction(Action = 'open', Header = 'Opening Cluedin')]
     [CmdletBinding()]
     param(
+        # The environment in which CluedIn will run.
         [Parameter(Position=0)]
         [String]$Env = 'default',
+        # Open the sign in page for the specified organization.
         [String]$Org = 'app'
     )
 
@@ -19,16 +29,45 @@ function Invoke-Open {
 }
 
 function Invoke-CreateOrg {
+    <#
+        .SYNOPSIS
+        Creates a new organization in CluedIn.
+
+        .DESCRIPTION
+        When creating a new organization an organization admin account is also created.
+        The associated login details are returned.
+
+        .EXAMPLE
+        __AllParameterSets
+
+        ```powershell
+        > .\cluedin.ps1 createorg -Name example
+
+        +-------------------------------+
+        | CluedIn - Create Organization |
+        +-------------------------------+
+
+        #...
+        Email: admin@example.com
+        Password: P@ssword!123
+        ```
+    #>
     [CluedInAction(Action = 'createorg', Header = 'Create Organization')]
     [CmdletBinding()]
     param(
+        # The environment in which CluedIn will run.
         [Parameter(Position=0)]
         [String]$Env = 'default',
+        # The name of the organization to created.
         [Parameter(Mandatory)]
         [string]$Name,
+        # The email/username of the organization admin.
         [ValidatePattern("^[a-zA-Z0-9.!#$%&*+\/=?^_{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")]
         [string]$Email = "admin@${Name}.com",
+        # The password of the organization admin.
         [string]$Pass = "P@ssword!123",
+        # If set to true, will allow direct email sign up for future users
+        # using an email that matches the organization admins email domain.
         [switch]$AllowEmailSignup = $false
     )
 

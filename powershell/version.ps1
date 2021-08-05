@@ -1,4 +1,13 @@
 function Invoke-Version {
+    <#
+        .SYNOPSIS
+        Get version information for Home.
+
+        .DESCRIPTION
+        Verify the version of CluedIn Home that you are running.
+        This information can be used to validate the version and
+        commit you have checked out.
+    #>
     [CmdletBinding()]
     [CluedInAction(Action = 'version', Header = 'Version')]
     param(

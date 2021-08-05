@@ -1,7 +1,41 @@
 function Test-Environment {
+    <#
+        .SYNOPSIS
+        Tests environment configuration is acceptable for CluedIn.
+
+        .DESCRIPTION
+        Performs a series of checks against the host machine for required services (e.g. docker),
+        performance concerns (e.g. available memory), and validates environment configuration
+        (e.g. port availability).
+
+        .EXAMPLE
+        __AllParameterSets
+
+        ```powershell
+        > .\cluedin.ps1 check
+        
+        +----------------------------+
+        | CluedIn - Pre-Flight Check |
+        +----------------------------+
+        Installed Applications
+        [1/3] ✅ » PowerShell : 7.1.1 / Core
+        [2/3] ✅ » Docker : 20.10.7 / linux
+        [3/3] ✅ » Docker Compose : 1.29.2
+        Available Ports
+        [1/23] ✅ » CluedIn UI : 127.0.0.1.nip.io:9080
+        [2/23] ✅ » CluedIn API : 127.0.0.1.nip.io:9000
+        [3/23] ✅ » CluedIn Auth : 127.0.0.1.nip.io:9001
+        [4/23] ✅ » CluedIn Jobs : 127.0.0.1.nip.io:9003
+        [5/23] ✅ » CluedIn WebHooks : 127.0.0.1.nip.io:9006
+        [6/23] ✅ » CluedIn Public : 127.0.0.1.nip.io:9007
+        #...
+        ```
+    #>
     [CmdletBinding()]
     [CluedInAction(Action = 'check', Header = 'Pre-Flight Check')]
     param(
+        # The environment in which CluedIn will run.
+        [Parameter(Position=0)]
         [String]$Env = 'default'
     )
 
@@ -75,7 +109,7 @@ function Test-Environment {
                     $message = $args[0].Data.Registry
                     [CheckResult]::new($success, $message)
                 },
-                'You must be authorised for the specified registry.')
+                'You must be authorized for the specified registry.')
     ))
 
     $envChecks = [CheckCollection]::new('Environment', @(
@@ -99,9 +133,20 @@ function Test-Environment {
 }
 
 function Test-InstanceStatus {
+    <#
+        .SYNOPSIS
+        Checks the health status of a running CluedIn instance.
+
+        .DESCRIPTION
+        Requests the health status of a running CluedIn instance,
+        reporting back a red/green status for each hosted web service and
+        each data persistance service.
+    #>
     [CluedInAction(Action = 'status', Header = 'Status Check')]
     [CmdletBinding()]
     param(
+        # The environment in which CluedIn is running.
+        [Parameter(Position=0)]
         [String]$Env = 'default'
     )
 

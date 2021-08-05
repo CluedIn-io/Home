@@ -61,9 +61,19 @@ function Get-CluedInDynamicAction {
     return $null
 }
 
-# Entrypoint for sub scripts
+$ClassesModuleFileName = 'cluedin.classes.ps1';
+
+# Import classes and configure paths
+#
+# Notice, it's important to provide $PSScriptRoot from here rather than rely on value in module's static ctor,
+# as otherwise variable might be evaluated incorrectly.
+Import-Module (Join-Path $PSScriptRoot $ClassesModuleFileName) -Force
+[Paths]::InitPaths($PSScriptRoot)
+
+# Entry point for sub scripts
 $importArgs = @{
     Include = '*.ps1'
+    Exclude = $ClassesModuleFileName
     Path    = Join-Path $PSScriptRoot '*'
 }
 

@@ -2,30 +2,81 @@ using namespace System.Management.Automation
 using namespace System.Collections.ObjectModel
 
 function Invoke-Environment {
-    [CmdletBinding(DefaultParameterSetName='get')]
+    <#
+        .SYNOPSIS
+        Management of CluedIn environments.
+
+        .DESCRIPTION
+        Environments allow alternative configurations of CluedIn to be managed
+        at the same time.
+
+        Using environments, you can configure different versions of CluedIn,
+        configure different packages, validate different imports of data, and more.
+
+        .EXAMPLE
+        Set
+
+        Set one or more variables within an environment.
+
+        .EXAMPLE
+        Tag
+
+        Set the default tag to be used for all CluedIn services.
+        .EXAMPLE
+        Get
+
+        Displays current variables for an environment.
+
+        .EXAMPLE
+        Unset
+
+        Removes the current setting for a variable.
+
+        .EXAMPLE
+        Remove
+
+        Removes an environment completely.
+
+        .EXAMPLE
+        Tag Override
+
+        Enables overriding specific services with their own version of CluedIn.
+
+    #>
+    [CmdletBinding(DefaultParameterSetName='Get')]
     [CluedInAction(Action = 'env', Header = 'Manage Environment')]
     param(
-        [Parameter(Position=0, ParameterSetName='set')]
-        [Parameter(Position=0, ParameterSetName='setTag')]
-        [Parameter(Position=0, ParameterSetName='get')]
-        [Parameter(Position=0, ParameterSetName='unset')]
-        [Parameter(Position=0, ParameterSetName='remove')]
-        [Parameter(Position=0, ParameterSetName='setTagOverride')]
+        # The environment in which CluedIn will run.
+        [Parameter(Position=0, ParameterSetName='Set')]
+        [Parameter(Position=0, ParameterSetName='Tag')]
+        [Parameter(Position=0, ParameterSetName='Get')]
+        [Parameter(Position=0, ParameterSetName='Unset')]
+        [Parameter(Position=0, ParameterSetName='Remove')]
+        [Parameter(Position=0, ParameterSetName='Tag Override')]
         [string]$Name = 'default',
-        [Parameter(ParameterSetName='set', Mandatory)]
+        # Variables to set within the environment.
+        # e.g. `-set CLUEDIN_SERVER_LOCALPORT=9988,CLUEDIN_SQLSERVER_LOCALPORT=9533`
+        [Parameter(ParameterSetName='Set', Mandatory)]
         [string[]]$Set,
-        [Parameter(ParameterSetName='set')]
-        [Parameter(ParameterSetName='setTag', Mandatory)]
+        # The CluedIn version tag to use for all services.
+        [Parameter(ParameterSetName='Set')]
+        [Parameter(ParameterSetName='Tag', Mandatory)]
         [string]$Tag = [string]::Empty,
-        [Parameter(ParameterSetName='set')]
-        [Parameter(ParameterSetName='setTag')]
-        [Parameter(ParameterSetName='setTagOverride', Mandatory)]
+        # The CluedIn version tag to use for specific services.
+        # The names or services match those reported by docker when starting CluedIn
+        # e.g. `-tagoverride server=3.2.4-beta,sqlserver=3.2.4-beta`
+        [Parameter(ParameterSetName='Set')]
+        [Parameter(ParameterSetName='Tag')]
+        [Parameter(ParameterSetName='Tag Override', Mandatory)]
         [string[]]$TagOverride = @(),
-        [Parameter(ParameterSetName='get')]
+        # When set, displays information about the environment.
+        [Parameter(ParameterSetName='Get')]
         [switch]$Get,
-        [Parameter(ParameterSetName='unset',Mandatory)]
+        # The names of variables to be unset in the environment.
+        [Parameter(ParameterSetName='Unset',Mandatory)]
         [string[]]$Unset,
-        [Parameter(ParameterSetName='remove',Mandatory)]
+        # When set, fully removes the environment from disk.
+        [Parameter(ParameterSetName='Remove',Mandatory)]
         [Alias('rm')]
         [switch]$Remove
     )
@@ -33,7 +84,7 @@ function Invoke-Environment {
     process {
 
         switch ($PSCmdlet.ParameterSetName) {
-            {$_ -in @('set', 'setTag', 'setTagOverride')} {
+            {$_ -in @('Set', 'Tag', 'Tag Override')} {
                 $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
 
                 if($Set) {
@@ -67,7 +118,7 @@ function Invoke-Environment {
 
                 SetEnvironment $Name $env
             }
-            'get' {
+            'Get' {
                 $env = GetEnvironment $Name
                 if(-not $env) {
                     Write-Host "Could not find environment ${Name}";
@@ -77,7 +128,7 @@ function Invoke-Environment {
                 $env
 
             }
-            'unset' {
+            'Unset' {
                 $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
                 foreach($rmKey in $Unset){
                     $foundKey = $env.Keys | Where-Object { $_ -eq $rmKey }
@@ -88,7 +139,7 @@ function Invoke-Environment {
                 }
                 SetEnvironment $Name $env
             }
-            'remove' {
+            'Remove' {
                 if($Name -eq 'default'){
                     Write-Host "You cannot remove the default environment."
                     return

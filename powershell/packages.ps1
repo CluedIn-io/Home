@@ -8,40 +8,109 @@ $script:initConfig = @"
 "@
 
 function Invoke-Packages {
+    <#
+        .SYNOPSIS
+        Manage packages for a CluedIn instance.
+        
+        .DESCRIPTION
+        The packages command controls the configuration and management of
+        nuget packages to extend and enhance a CluedIn implementation.
+        Packages can be added from public or private feeds and restored
+        before starting an environment.
+
+        Any changes to the package or feeds list, will require a `clean` and
+        `restore` to ensure the correct packages are available to the environment.
+
+        .EXAMPLE
+        List
+
+        Displays the packages and versions that would be restored.
+
+        .EXAMPLE
+        Add
+
+        Adds a package to the package list.
+
+        .EXAMPLE
+        Remove
+
+        Removes a package from the package list.
+
+        .EXAMPLE
+        Add Feed
+
+        Adds a new package feed to the packages sources.
+        The feed can be a public url or a local file path.
+
+        .EXAMPLE
+        Remove Feed
+
+        Removes a feed from the package sources.
+
+        .EXAMPLE
+        Clean
+
+        Removes all restored packages from disk.
+        Configured package versions and feeds are not removed.
+
+        .EXAMPLE
+        Restore
+
+        Using the configured package sources and package versions,
+        downloads and collates package libraries to disk so that
+        the CluedIn environment can install them during startup.
+    #>
     [CluedInAction(Action = 'packages', Header = 'Packages')]
-    [CmdletBinding(DefaultParameterSetName='list')]
+    [CmdletBinding(DefaultParameterSetName='List')]
     param(
+        # The environment in which CluedIn will run.
         [Parameter(Position=0)]
         [string]$Env = 'default',
-        [Parameter(ParameterSetName='list')]
+        # When set, will display the currently configured package details.
+        [Parameter(ParameterSetName='List')]
         [switch]$List = $false,
-        [Parameter(ParameterSetName='add', Mandatory)]
+        # The name of a package to be added to the environment.
+        [Parameter(ParameterSetName='Add', Mandatory)]
         [string]$Add,
-        [Parameter(ParameterSetName='add')]
+        # The version of the package to be added.
+        # If not provided, the latest release version will be used.
+        # May be configured with '<version>-*'. This will cause the latest pre-release
+        # of <version> to be restored, or <version> will be restored if it has been released.
+        [Parameter(ParameterSetName='Add')]
         [string]$Version = [string]::empty,
-        [Parameter(ParameterSetName='remove', Mandatory)]
+        # The name of a package to remove from the environment.
+        [Parameter(ParameterSetName='Remove', Mandatory)]
         [string]$Remove,
-        [Parameter(ParameterSetName='addFeed', Mandatory)]
+        # The name of a feed to be added to the feeds list.
+        [Parameter(ParameterSetName='Add Feed', Mandatory)]
         [string]$AddFeed,
-        [Parameter(ParameterSetName='addFeed', Mandatory)]
+        # The uri of the feed to be added.
+        [Parameter(ParameterSetName='Add Feed', Mandatory)]
         [string]$Uri,
-        [Parameter(ParameterSetName='addFeed')]
+        # The username for a feed if the feed requires authentication.
+        [Parameter(ParameterSetName='Add Feed')]
         [string]$User,
-        [Parameter(ParameterSetName='addFeed')]
+        # The password for a feed if the feed requires authentication.
+        [Parameter(ParameterSetName='Add Feed')]
         [string]$Pass,
-        [Parameter(ParameterSetName='removeFeed', Mandatory)]
+        # The name of a feed to be removed from the feeds list.
+        [Parameter(ParameterSetName='Remove Feed', Mandatory)]
         [string]$RemoveFeed,
-        [Parameter(ParameterSetName='clean', Mandatory)]
+        #  When set, will remove all restored packages for the environment.
+        [Parameter(ParameterSetName='Clean', Mandatory)]
         [switch]$Clean,
-        [Parameter(ParameterSetName='restore', Mandatory)]
+        # When set, will restore all packages for the environment.
+        [Parameter(ParameterSetName='Restore', Mandatory)]
         [switch]$Restore,
-        [Parameter(ParameterSetName='restore')]
-        [Parameter(ParameterSetName='addFeed')]
-        [Parameter(ParameterSetName='removeFeed')]
+        # When set, will use a specific version of the nuget-installer image.
+        [Parameter(ParameterSetName='Restore')]
+        [Parameter(ParameterSetName='Add Feed')]
+        [Parameter(ParameterSetName='Remove Feed')]
         [String]$Tag = [string]::Empty,
-        [Parameter(ParameterSetName='restore')]
-        [Parameter(ParameterSetName='addFeed')]
-        [Parameter(ParameterSetName='removeFeed')]
+        # When set, will force a docker pull of the nuget-installer image.
+        [Parameter(ParameterSetName='Restore')]
+        [Parameter(ParameterSetName='Add Feed')]
+        [Parameter(ParameterSetName='Remove Feed')]
         [switch]$Pull
     )
 
@@ -114,7 +183,7 @@ function Invoke-Packages {
     }
 
     switch ($PSCmdlet.ParameterSetName) {
-        'add' {
+        'Add' {
             $packageList = [array](ReadPackageList)
             $updated = $false
             foreach($entry in $packageList)
@@ -141,14 +210,14 @@ function Invoke-Packages {
             }
             WritePackageList $packageList
         }
-        'remove' {
+        'Remove' {
             $packageList = [array](ReadPackageList)
             $newList = $packageList | Where-Object { $_.Package -ne $Remove }
 
             Write-Host "Remove package ${Remove}"
             WritePackageList $newList
         }
-        'list' {
+        'List' {
             $packageList = [array](ReadPackageList)
 
             if($packageList.Count) {
@@ -157,7 +226,7 @@ function Invoke-Packages {
                 Write-Host 'No packages specified'
             }
         }
-        'addFeed' {
+        'Add Feed' {
             $nugetCmd = " nuget add source $Uri -n $AddFeed"
 
             if($User) { $nugetCmd += " -u $User" }
@@ -168,19 +237,19 @@ function Invoke-Packages {
             Write-Verbose "[docker] $fullCmd"
             Invoke-Expression $fullCmd
         }
-        'removeFeed' {
+        'Remove Feed' {
             $nugetCmd = " nuget remove source $RemoveFeed"
             $nugetCmd += " --configfile /packages/nuget.config"
             $fullCmd = $baseDotnetCommand + $nugetCmd
             Write-Verbose "[docker] $fullCmd"
             Invoke-Expression $fullCmd
         }
-        'clean' {
+        'Clean' {
             Get-Item $components -ErrorAction Ignore |
                 Remove-Item -Recurse -Force -ErrorAction Ignore
             Write-Host 'Packages cleaned'
         }
-        'restore' {
+        'Restore' {
             $envFile = Join-Path $envPath '.env'
             $runCmd = "docker run --rm -a stdout -a stderr -v '${components}:/components' -v '${packages}:/packages' --env-file '$envFile' $image"
             Write-Verbose "[docker]: $runCmd"
