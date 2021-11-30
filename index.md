@@ -32,8 +32,8 @@ You should run your terminal session as an administrator, or `sudo` for non-wind
 
 ## Quick Start
 
-> All examples are provided as if running in a powershell session.
-> If not running in a powershell session, prefix all commands with `pwsh` - e.g. `pwsh .\cluedin.ps1 open`
+> All examples are provided as if running in a PowerShell session.
+> To begin a PowerShell session, enter the command `pwsh` [and a new session will start](./faq/pwsh.md)
 
 ```powershell
 # Check out the repository
