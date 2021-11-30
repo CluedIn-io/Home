@@ -161,8 +161,33 @@ function FindEnvironment {
     )
 
     process {
-        Get-ChildItem ([Paths]::Env) -Filter "${Name}" -ErrorAction Ignore
+        $envDir = Get-ChildItem ([Paths]::Env) -Filter "${Name}" -ErrorAction Ignore
+        if(!$envDir) { return $null }
+
+        $envDir | Add-Member -Name UniqueName -MemberType ScriptProperty -Value {
+            $dirName = $this.BaseName.ToLowerInvariant()
+
+            # Temporarily simplify update story for customers. Consider removing in 3.3+
+            if($env:CLUEDIN_LEGACY_ENV_NAME -eq "1") {
+                return $dirName
+            }
+
+            $fullPathHash = '{0:x8}' -f [StringHashes]::GetStableHashCode($this.FullName)
+
+            return "$($dirName)_$fullPathHash"
+        }
+
+        $envDir
     }
+}
+
+function Find-Environment {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
+
+    FindEnvironment @PSBoundParameters
 }
 
 function GetEnvironment {

@@ -1,6 +1,7 @@
 version: '3.7'
 services:
     webapi:
+        user: root
         image: cluedin/app:${CLUEDIN_WEBAPI_TAG}
         environment:
         - ConnectionStrings__AuthenticationStore=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True;;

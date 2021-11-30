@@ -24,7 +24,7 @@ services:
               source: ./data/elasticsearch/data
               target: /usr/share/elasticsearch/data
     rabbitmq:
-        image: rabbitmq:3.7-management-alpine
+        image: rabbitmq:3.9.7-management-alpine
         ports:
             - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
             - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
@@ -47,3 +47,38 @@ services:
         image: cluedin/openrefine:${CLUEDIN_OPENREFINE_TAG}
         ports:
             - "${CLUEDIN_OPENREFINE_LOCALPORT:-3333}:3333"
+    prometheus:
+        image: prom/prometheus:latest
+        deploy:
+            replicas: ${CLUEDIN_PROMETHEUS_SCALE_COUNT:-0}
+        ports:
+            - "9090:9090"
+        volumes:
+            - type: bind
+              source: ./prometheus/prometheus.yml
+              target: /etc/prometheus/prometheus.yml
+        command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
+    grafana:
+        image: grafana/grafana:latest
+        environment:
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_SECURITY_ALLOW_EMBEDDING=true
+            - GF_USERS_DEFAULT_THEME=light
+            - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_USERS_ALLOW_ORG_CREATE=false
+            - GF_AUTH_DISABLE_SIGNOUT_MENU=true
+        ports:
+            - "3030:3000"
+        volumes:
+            - type: bind
+              source: ./grafana/dashboards.yml
+              target: /etc/grafana/provisioning/dashboards/dashboards.yml
+            - type: bind
+              source: ./grafana/datasource.yml
+              target: /etc/grafana/provisioning/datasources/datasource.yml
+            - type: bind
+              source: ./grafana/datasource-dashboard.json
+              target: /var/lib/grafana/dashboards/datasource-dashboard.json
+            - type: bind
+              source: ./grafana/streams-dashboard.json
+              target: /var/lib/grafana/dashboards/streams-dashboard.json
