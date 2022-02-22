@@ -3,6 +3,7 @@ $script:initConfig = @"
 <configuration>
   <packageSources>
     <add key="local" value="/packages/local" />
+    <add key="cluedin_public" value="https://pkgs.dev.azure.com/CluedIn-io/Public/_packaging/Public/nuget/v3/index.json" />
   </packageSources>
 </configuration>
 "@
@@ -11,7 +12,7 @@ function Invoke-Packages {
     <#
         .SYNOPSIS
         Manage packages for a CluedIn instance.
-        
+
         .DESCRIPTION
         The packages command controls the configuration and management of
         nuget packages to extend and enhance a CluedIn implementation.

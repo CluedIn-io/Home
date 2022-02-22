@@ -198,7 +198,7 @@ class EnvironmentToggle {
             else { $current = $current.Value }
             $this.Container[$Variable] = $current
         }
-        Set-Item $path.ToUpper() $Value
+        Set-Item $path $Value
     }
 
     [void] Reset() {
@@ -213,13 +213,10 @@ class EnvironmentToggle {
 
 class Paths {
     static [string]$Env
-    static [string]$ClusterEnv
-    static [string]$TerraformScripts
 
     static [string] EnvironmentForContext([string] $context) {
         $result = switch ($context) {
             docker { [Paths]::Env }
-            cluster { [Paths]::ClusterEnv }
             default {
                 throw "Unknown context '$context'"
             }

@@ -32,6 +32,7 @@ services:
     user: root
     image: cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
     environment:
+    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
     - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
     - DbPassword=${CLUEDIN_SQLSERVER_PASS}

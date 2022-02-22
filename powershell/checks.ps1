@@ -100,6 +100,8 @@ function Test-Environment {
         [PortCheck]::new('Redis', $envDetails.CLUEDIN_REDIS_LOCALPORT ?? 6379, 'localhost')
         [PortCheck]::new('Seq UI', $envDetails.CLUEDIN_SEQ_UI_LOCALPORT ?? 3200, 'localhost')
         [PortCheck]::new('Seq Data', $envDetails.CLUEDIN_SEQ_DATA_LOCALPORT ?? 5341, 'localhost')
+        [PortCheck]::new('SMTP UI', $envDetails.CLUEDIN_SMTP_HTTP_LOCALPORT ?? 25258, 'localhost')
+        [PortCheck]::new('SMTP Email', $envDetails.CLUEDIN_EMAIL_PORTT ?? 2525, 'localhost')
         [PortCheck]::new('Sql Server', $envDetails.CLUEDIN_SQLSERVER_LOCALPORT ?? 1433, 'localhost')
         [PortCheck]::new('OpenRefine', $envDetails.CLUEDIN_OPENREFINE_LOCALPORT ?? 3333, 'localhost')
     ))

@@ -83,43 +83,100 @@ function Invoke-Environment {
 
     process {
 
+        # Base args to match to inner calls
+        $innerArgs = @{
+            Context = 'docker'
+            Name = $Name
+        }
+
         switch ($PSCmdlet.ParameterSetName) {
             {$_ -in @('Set', 'Tag', 'Tag Override')} {
-                $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
+                InvokeEnvironment @innerArgs -Set $Set -SetCustom {
 
-                if($Set) {
-                    $Set |
-                        ParseEnvironmentEntry |
-                        ForEach-Object {
-                            Write-Host "Setting '$($_.Key)' in '$Name' environment"
-                            $env[$_.Key] = $_.Value
+                    ### $env is injected into the scope of this block ###
+                    # Update tags
+                    if($Tag) {
+                        $keys = [string[]]::new($env.Keys.Count)
+                        $env.Keys.CopyTo($keys, 0)
+                        foreach ($key in $keys) {
+                            if($key -match 'CLUEDIN_(\w+)_TAG'){
+                                Write-Host "Setting '${key}' in '$Name' environment"
+                                $env[$key] = $Tag
+                            }
                         }
-                }
+                    }
 
-                if($Tag) {
-                    $keys = [string[]]::new($env.Keys.Count)
-                    $env.Keys.CopyTo($keys, 0)
-                    foreach ($key in $keys) {
-                        if($key -match 'CLUEDIN_(\w+)_TAG'){
-                            Write-Host "Setting '${key}' in '$Name' environment"
-                            $env[$key] = $Tag
+                    # Update overrides
+                    $TagOverride | ForEach-Object {
+                        $key,$value = $_ -split '='
+                        if($key -and $value) {
+                            $key = $key.ToUpper()
+                            Write-Host "Setting 'CLUEDIN_${key}_TAG' in '$Name' environment"
+                            $env["CLUEDIN_${key}_TAG"] = $value
                         }
                     }
                 }
+            }
+            'get' {
+                InvokeEnvironment @innerArgs -get
+            }
+            'unset' {
+                InvokeEnvironment @innerArgs -Unset $Unset
+            }
+            'remove' {
+                InvokeEnvironment @innerArgs -Remove
+            }
+        }
+    }
+}
 
-                $TagOverride | ForEach-Object {
-                    $key,$value = $_ -split '='
-                    if($key -and $value) {
-                        $key = $key.ToUpper()
-                        Write-Host "Setting 'CLUEDIN_${key}_TAG' in '$Name' environment"
-                        $env["CLUEDIN_${key}_TAG"] = $value
+function InvokeEnvironment {
+    param(
+        [Parameter(Position=0, ParameterSetName='set')]
+        [Parameter(Position=0, ParameterSetName='get')]
+        [Parameter(Position=0, ParameterSetName='unset')]
+        [Parameter(Position=0, ParameterSetName='remove')]
+        [string]$Name = 'default',
+        [Parameter(Position=1, ParameterSetName='set')]
+        [Parameter(Position=1, ParameterSetName='get')]
+        [Parameter(Position=1, ParameterSetName='unset')]
+        [Parameter(Position=1, ParameterSetName='remove')]
+        [string]$Context = 'docker',
+        [Parameter(ParameterSetName='set')]
+        [string[]]$Set,
+        [Parameter(ParameterSetName='set')]
+        [scriptblock]$SetCustom,
+        [Parameter(ParameterSetName='get')]
+        [switch]$Get,
+        [Parameter(ParameterSetName='unset',Mandatory)]
+        [string[]]$Unset,
+        [Parameter(ParameterSetName='remove',Mandatory)]
+        [Alias('rm')]
+        [switch]$Remove
+    )
+
+    process {
+
+        switch ($PSCmdlet.ParameterSetName) {
+            'set' {
+                $env = (GetEnvironment $Name $Context) ?? (GetEnvironment 'default' $Context)
+
+                $Set |
+                    Where-Object { $_ } |
+                    ParseEnvironmentEntry |
+                    ForEach-Object {
+                        Write-Host "Setting '$($_.Key)' in '$Name' environment"
+                        $env[$_.Key] = $_.Value
                     }
+
+                if($SetCustom) {
+                    $SetCustom.Invoke($env)
                 }
 
-                SetEnvironment $Name $env
+                SetEnvironment $Name $Context $env
             }
             'Get' {
-                $env = GetEnvironment $Name
+                $env = GetEnvironment $Name $Context
                 if(-not $env) {
                     Write-Host "Could not find environment ${Name}";
                     return
@@ -129,7 +186,7 @@ function Invoke-Environment {
 
             }
             'Unset' {
-                $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
+                $env = (GetEnvironment $Name $Context) ?? (GetEnvironment 'default' $Context)
                 foreach($rmKey in $Unset){
                     $foundKey = $env.Keys | Where-Object { $_ -eq $rmKey }
                     if($foundKey) {
@@ -137,14 +194,14 @@ function Invoke-Environment {
                         $env.Remove($foundKey)
                     }
                 }
-                SetEnvironment $Name $env
+                SetEnvironment $Name $Context $env
             }
             'Remove' {
                 if($Name -eq 'default'){
                     Write-Host "You cannot remove the default environment."
                     return
                 }
-                $env = FindEnvironment $Name
+                $env = FindEnvironment $Name $Context
                 if($env) {
                     Write-Host "Removing '$Name' environment"
                     Remove-Item $env -Recurse -Force
@@ -157,11 +214,15 @@ function Invoke-Environment {
 function FindEnvironment {
     param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [string]$Name
+        [string]$Name,
+        [string]$Context = 'docker'
     )
 
     process {
-        $envDir = Get-ChildItem ([Paths]::Env) -Filter "${Name}" -ErrorAction Ignore
+        $root = if($Context -eq 'docker') { [Paths]::Env }
+
+        $envDir = Get-ChildItem $root -Filter "${Name}" -ErrorAction Ignore
+
         if(!$envDir) { return $null }
 
         $envDir | Add-Member -Name UniqueName -MemberType ScriptProperty -Value {
@@ -184,7 +245,9 @@ function FindEnvironment {
 function Find-Environment {
     param(
         [Parameter(Mandatory)]
-        [string]$Name
+        [string]$Name,
+        [Parameter(Mandatory)]
+        [string]$Context
     )
 
     FindEnvironment @PSBoundParameters
@@ -193,10 +256,11 @@ function Find-Environment {
 function GetEnvironment {
     param(
         [Parameter(Mandatory)]
-        [string]$Name
+        [string]$Name,
+        [string]$Context = 'docker'
     )
 
-    $env = FindEnvironment $Name
+    $env = FindEnvironment $Name $Context
     if(!$env) { return $null}
 
     $envPath = Join-Path $env '.env'
@@ -218,10 +282,11 @@ function GetEnvironmentValue {
         [string]$Name,
         [Parameter(Mandatory)]
         [string]$Key,
-        [string]$DefaultValue = ''
+        [string]$DefaultValue = '',
+        [string]$Context = 'docker'
     )
 
-    $env = FindEnvironment $Name
+    $env = FindEnvironment $Name $Context
     $envPath = Join-Path $env '.env'
 
     if(Test-Path $envPath) {
@@ -245,15 +310,19 @@ function SetEnvironment {
         [Parameter(Mandatory)]
         [string]$Name,
         [Parameter(Mandatory)]
+        [string]$Context,
+        [Parameter(Mandatory)]
         [hashtable]$Settings
     )
 
-    $rootPath = Join-Path ([Paths]::Env) $Name
+    $root = if($Context -eq 'docker') { [Paths]::Env }
+    $rootPath = Join-Path $root $Name
     if(-not (Test-Path $rootPath)) { New-Item $rootPath -ItemType Directory > $null }
-    $Settings.GetEnumerator() |
+    $content = $Settings.GetEnumerator() |
         ForEach-Object { "$($_.Name.ToUpper())=$($_.Value)" } |
-        Sort-Object |
-        Set-Content (Join-Path $rootPath '.env')
+        Sort-Object
+
+    Set-Content (Join-Path $rootPath '.env') -Value $content
 }
 
 function ParseEnvironmentEntry {
@@ -281,10 +350,11 @@ function ParseEnvironmentEntry {
 function GetEnvironmentServiceTags {
     param(
         [Parameter(Mandatory)]
-        [string]$Name
+        [string]$Name,
+        [string]$Context = 'docker'
     )
 
-    $env = GetEnvironment $Name
+    $env = GetEnvironment $Name $Context
     if(!$env) { return }
 
     $envTags = @{}

@@ -18,6 +18,7 @@ function DockerCompose {
         return
     }
 
+
     $envPath = $environment.FullName
     $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
 
@@ -49,6 +50,16 @@ function DockerCompose {
                         }
                     }
                 }
+
+
+            # Prior to 3.3.0 databases for sql were in a different structure - the following caters to
+            # move those databases before starting
+            # data master translog
+            $sqlDataRoot = Join-Path $envPath 'data' 'sqlserver'
+            $sqlDataDir = Join-Path $sqlDataRoot 'data'
+            Get-ChildItem $sqlDataDir -Exclude 'datastore.*','.initialized' | Foreach-Object { Move-Item $_ -Destination (Join-Path $sqlDataRoot 'master' $_.Name ) }
+            Get-ChildItem $sqlDataDir -Filter '*.ldf' -File | Foreach-Object { Move-Item $_ -Destination (Join-Path $sqlDataRoot 'translog' $_.Name ) }
+
         }
     } finally {
         Pop-Location
@@ -58,7 +69,7 @@ function DockerCompose {
         # If action is up/start - we need to ensure prometheus ports are updated
         $prometheusPath = Join-Path $envPath 'prometheus' 'prometheus.yml'
         # This assumes that the targets are at the end of the file - powershell does not have a yaml converter out of the box
-        $prometheusContent = Get-Content $prometheusPath | Where-Object { $_ -notmatch '\s*-\s*host.docker.internal' }
+        $prometheusContent = Get-Content $prometheusPath | Where-Object { $_ -notmatch '\s*-\s*host.docker.internal:9' }
         $prometheusContent += @(
             "    - host.docker.internal:$(GetEnvironmentValue $Env CLUEDIN_ANNOTATION_LOCALPORT 9010)"
             "    - host.docker.internal:$(GetEnvironmentValue $Env CLUEDIN_SERVER_PROMETHEUS_METRICS_LOCALPORT 9013)"

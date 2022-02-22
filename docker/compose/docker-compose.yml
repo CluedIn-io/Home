@@ -1,5 +1,14 @@
 version: '3.7'
 services:
+    smtp4dev:
+        image: rnwood/smtp4dev:latest
+        ports:
+            - "${CLUEDIN_SMTP_HTTP_LOCALPORT:-25258}:80"
+            - "${CLUEDIN_SMTP_EMAIL_LOCALPORT:-2525}:25"
+        volumes:
+            - type: bind
+              source: ./data/smtp4dev/data
+              target: /smtp4dev
     neo4j:
         image: cluedin/neo4j:${CLUEDIN_NEO4J_TAG}
         environment:
@@ -28,10 +37,15 @@ services:
         ports:
             - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
             - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
+            - "${CLUEDIN_RABBITMQ_METRICS_LOCALPORT:-15692}:15692"
         environment:
             - RABBITMQ_DEFAULT_USER=${CLUEDIN_RABBITMQ_USERNAME:-guest}
             - RABBITMQ_DEFAULT_PASS=${CLUEDIN_RABBITMQ_PASSWORD:-guest}
         hostname: cluedin-dev
+        volumes:
+            - type: bind
+              source: ./prometheus/rabbitmq.conf
+              target: /etc/rabbitmq/conf.d/rabbitmq.conf
     redis:
         image: redis:5.0-alpine
         ports:
@@ -82,3 +96,23 @@ services:
             - type: bind
               source: ./grafana/streams-dashboard.json
               target: /var/lib/grafana/dashboards/streams-dashboard.json
+            - type: bind
+              source: ./grafana/rabbitmq-dashboard.json
+              target: /var/lib/grafana/dashboards/rabbitmq-dashboard.json
+            - type: bind
+              source: ./grafana/cadvisor.json
+              target: /var/lib/grafana/dashboards/cadvisor.json
+            - type: bind
+              source: ./grafana/cadvisor-global.json
+              target: /var/lib/grafana/dashboards/cadvisor-global.json
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor:latest
+        ports:
+            - "8484:8080"
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        depends_on:
+            - sqlserver

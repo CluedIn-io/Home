@@ -22,6 +22,7 @@ services:
         - EmailSettings__FromAddress=${CLUEDIN_EMAIL_SENDER}
         - EmailSettings__SmtpUserName=${CLUEDIN_EMAIL_USER}
         - EmailSettings__SmtpPassword=${CLUEDIN_EMAIL_PASS}
+        - EmailSettings__EnableSsl=${CLUEDIN_EMAIL_SSL}
         - EmailSettings__SpecifiedPickupDirectory=${CLUEDIN_EMAIL_DIR:-}
         - ASPNETCORE_WEBROOT=/
         volumes:

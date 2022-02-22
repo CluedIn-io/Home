@@ -5,17 +5,15 @@
 param(
     [Parameter(Mandatory)]
     [String]$Action
+
 )
 
 dynamicparam {
     $importedModule = Import-Module -Name ([IO.Path]::Combine($PSScriptRoot, 'powershell', 'cluedin.psm1')) -PassThru
-
-    if($Action) {
-        $scriptParams = $MyInvocation.MyCommand.Parameters.Keys
-        $ciAction = Get-CluedInDynamicAction -Action $Action -ExistingParams $scriptParams
-        if($ciAction) {
-            return $ciAction.DynamicParams
-        }
+    $scriptParams = $MyInvocation.MyCommand.Parameters.Keys
+    $ciAction = Get-CluedInDynamicAction -Action $Action -Context 'docker' -ExistingParams $scriptParams
+    if($ciAction) {
+        return $ciAction.DynamicParams
     }
 }
 
@@ -33,7 +31,7 @@ process {
     if(-not $ciAction) {
         Write-Error "Unrecognized action: $Action"
     } else {
-        Write-Output $ciAction.Header
+        Write-Information $ciAction.Header -InformationAction Continue
         & $ciAction.Command @PSBoundParameters
     }
 }

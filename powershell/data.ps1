@@ -50,13 +50,13 @@ function Invoke-Data {
 
     $envPath = $Env | FindEnvironment
     if(-not $envPath) {
-        Write-Host "Could not find environment ${Env}"
+        Write-Host "Could not find environment ${Env}" -ForegroundColor DarkRed
         return
     }
 
     $dataRoot = Join-Path $envPath 'data'
     if(-not (Test-Path $dataRoot)) {
-        Write-Host "No data found for ${Env}"
+        Write-Host "No data found for ${Env}" -ForegroundColor DarkYellow
         return
     }
 
@@ -69,10 +69,11 @@ function Invoke-Data {
         )
 
         if(Test-Path $Path) {
-            Write-Host "Clearing data for ${Name}"
+            Write-Host "Clearing data for ${Name}..." -NoNewline
             Remove-Item $Path -Recurse -Force
+            Write-Host " Done" -ForegroundColor Green
         } else {
-            Write-Host "No data found for ${Name}"
+            Write-Host "No data found for ${Name}" -ForegroundColor DarkYellow
         }
     }
 

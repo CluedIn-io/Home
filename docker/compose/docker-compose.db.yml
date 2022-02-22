@@ -5,8 +5,20 @@ services:
         entrypoint: ["sh","-c","/init/init.sh"]
         ports:
             - "${CLUEDIN_SQLSERVER_LOCALPORT:-1433}:1433"
+        environment:
+            - MSSQL_INIT_LOCK=/mssql-data/data
+            - MSSQL_DATA_DIR=/mssql-data/data/
+            - MSSQL_LOG_DIR=/mssql-translog/translog/
+            - MSSQL_MASTER_DATA_FILE=/mssql-data/master/master.mdf
+            - MSSQL_MASTER_LOG_FILE=/mssql-data/master/mastlog.ldf
         volumes:
             - type: bind
               source: ./data/sqlserver/data
-              target: /var/opt/mssql/data
+              target: /mssql-data/data/
+            - type: bind
+              source: ./data/sqlserver/master
+              target: /mssql-data/master/
+            - type: bind
+              source: ./data/sqlserver/translog
+              target: /mssql-translog/translog/
 

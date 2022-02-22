@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+    libpostal:
+        image: cluedin/libpostal:${CLUEDIN_LIBPOSTAL_TAG}
+        ports:
+            - "${CLUEDIN_LIBPOSTAL_HTTP_LOCALPORT:-9020}:${CLUEDIN_LIBPOSTAL_HTTP_PORT:-8080}"
+        deploy:
+            replicas: ${CLUEDIN_LIBPOSTAL_REPLICAS:-0}

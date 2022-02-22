@@ -1,4 +1,15 @@
 scrape_configs:
+- job_name: rabbitTargets
+  scrape_interval: 5s
+  metrics_path: "/metrics"
+  static_configs:
+  - targets:
+    - rabbitmq:15692
+- job_name: cadvisor
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - host.docker.internal:8484
 - job_name: prometheusTargets
   scrape_interval: 5s
   metrics_path: "/metrics"

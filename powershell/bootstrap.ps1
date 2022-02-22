@@ -72,7 +72,7 @@ function Invoke-CreateOrg {
     )
 
     $serverPort  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_AUTH_LOCALPORT' -DefaultValue '9001'
-    $domain = $env.CLUEDIN_DOMAIN ?? 'localhost'
+    $domain = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_DOMAIN' -DefaultValue 'localhost'
     $requestArgs = @{
         Method = 'POST'
         Uri = "http://${domain}:${serverPort}/api/account/new"
