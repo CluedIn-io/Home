@@ -1,7 +1,7 @@
 ---
 has_children: True
-title: v3.3.0
 has_toc: False
+title: v3.3.0
 ---
 
 # Release Notes - v3.3.0
