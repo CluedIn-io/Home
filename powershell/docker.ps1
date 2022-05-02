@@ -23,7 +23,14 @@ function DockerCompose {
     $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
 
     $projectName = "-p cluedin_$($environment.UniqueName)"
-    $composeFiles = Get-ChildItem $composeRoot -Filter 'docker-compose*.yml' | ForEach-Object { "-f '$($_.FullName)'" }
+    # Only include libpostal if scale is set
+    $exclude = $null
+    $libPostalReplicas = [int](GetEnvironmentValue $Env CLUEDIN_LIBPOSTAL_REPLICAS 0)
+    if($libPostalReplicas -lt 1){
+        $exclude = '*libpostal*'
+    }
+    # Note: folder must have '*' to enable filter and exclude to work together
+    $composeFiles = Get-ChildItem (Join-Path $composeRoot *) -Filter 'docker-compose*.yml' -Exclude $exclude | ForEach-Object { "-f '$($_.FullName)'" }
 
     # If action is up/start - we need to make sure the data folders exist
     try {
