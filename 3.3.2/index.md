@@ -6,7 +6,4 @@ has_children: True
 
 # Release Notes - v3.3.2
 
-## Features
-
-## Fixes
-
+> Supporting release for CluedIn Platform 3.3.2
