@@ -53,7 +53,7 @@ Added package MyCustomExtension
 > You can also specify a version for your package if you need to using `-version`.
 > You can also use [floating versions] e.g. `1.0.0-*` for the latest pre-release.
 
-### 3. Package your extension
+### 3. Pack your extension
 
 We can now build our extension as a nuget package - providing the path to the custom environment `local` folder:
 ```cmd
@@ -139,33 +139,28 @@ Enable COREDUMP mode - [SKIPPED]
 Installing component extensions - [COMPLETE]
 ```
 
-### 7. Update and re-deploy
+### 7. Restart Server
 
-As our package contents are copied _into_ the container we must `down` and `up` our container to update the contents.
+As our package contents are copied _into_ the container we must restart the cluedin server. We can do this by calling `up` and excluding the service,
+followed by calling `up` again with all services.
 
 ```powershell
-> .\cluedin.ps1 down custom
-# Alternatively pass the flag to retain data (such as sql, elastic etc)
-> .\cluedin.ps1 down custom -KeepData
-
-+-------------------------------+
-| CluedIn - Environment => down |
-+-------------------------------+
-Stopping cluedin_custom_gql_1           ... done
-Stopping cluedin_custom_clean_1         ... done
-Stopping cluedin_custom_ui_1            ...
-Stopping cluedin_custom_datasource_1    ...
-Stopping cluedin_custom_server_1        ...
-# ...
-```
-
-We can then continue with the development loop:
-``` powershell
-> dotnet build .\MyCustomExtension\
-> .\cluedin.ps1 packages custom -Restore
+> .\cluedin.ps1 up custom -disable server
 > .\cluedin.ps1 up custom
 ```
+### 8. Update your package
 
+Any changes to the `packages.txt` will require `-restore` to be called again.
+If you are using [floating versions] and you want to restore a new version of a package, you can simply run `-restore` again.
+
+> When building packages locally, it is **strongly** recommended to ensure your package builds with a new version each time. NuGet (which underpins the restore process) assumes once a package is available for a specific version, it will not change in future, so it is persisted in a cache for future requests.
+
+If you rebuild the _same version_ you have previously restored, you will need to clear the cache during a restore by passing the `-ClearCache` flag. All nuget packages are stored in the same cache it is not currently possible to clear the cache for a specific feed.
+```powershell
+> .\cluedin.ps1 packages custom -Restore -Force -ClearCache
+> .\cluedin.ps1 up custom -disable server
+> .\cluedin.ps1 up custom
+```
 
 [nuget]: https://docs.microsoft.com/en-us/nuget/what-is-nuget
 [floating versions]: https://docs.microsoft.com/en-us/nuget/concepts/dependency-resolution#floating-versions
