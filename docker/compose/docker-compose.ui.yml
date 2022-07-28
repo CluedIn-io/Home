@@ -22,7 +22,6 @@ services:
     - REACT_APP_UI_UPLOAD_LIMIT=${CLUEDIN_UI_UPLOAD_LIMIT:-1gb}
     depends_on:
     - server
-
   gql:
     user: root
     image: cluedin/cluedin-ui-gql:${CLUEDIN_GQL_TAG}

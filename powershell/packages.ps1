@@ -100,9 +100,13 @@ function Invoke-Packages {
         #  When set, will remove all restored packages for the environment.
         [Parameter(ParameterSetName='Clean', Mandatory)]
         [switch]$Clean,
-        # When set, will restore all packages for the environment.
+        # When set, will restore packages for the environment.
         [Parameter(ParameterSetName='Restore', Mandatory)]
         [switch]$Restore,
+        # When set, will clear caches. Should be used when restoring local packages
+        # where the build number has not changed.
+        [Parameter(ParameterSetName='Restore')]
+        [switch]$ClearCache,
         # When set, will use a specific version of the nuget-installer image.
         [Parameter(ParameterSetName='Restore')]
         [Parameter(ParameterSetName='Add Feed')]
@@ -115,8 +119,8 @@ function Invoke-Packages {
         [switch]$Pull
     )
 
-    $envPath = $Env | FindEnvironment
-    if(-not $envPath) {
+    $environment = $Env | FindEnvironment
+    if(-not $environment) {
         Write-Host "Could not find environment ${Env}"
         return
     }
@@ -125,9 +129,28 @@ function Invoke-Packages {
         $Tag = GetEnvironmentValue $Env 'CLUEDIN_INSTALLER_TAG'
     }
 
-    $image = "cluedin/nuget-installer:$tag"
+    $envPath = $environment.FullName
+    $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
+    $projectName = "-p cluedin_$($environment.UniqueName)_nuget"
+    $composeFile = "-f $(Join-Path $composeRoot 'docker-compose.installer.yml')"
+    $composeContext = "--project-directory '${envPath}' --env-file '$(Join-Path $envPath .env)'"
+    $baseCommand = "docker-compose ${projectName} ${composeFile} ${composeContext}"
+
+    function BuildCommand{
+        param(
+            [string]$Command
+        )
+
+        $composeCommand = 'up'
+        if($Command) {
+            $composeCommand = "run --rm --entrypoint '${Command}'"
+        }
+
+        return "${baseCommand} $composeCommand installer"
+    }
+
     if($Pull) {
-        $pullCommand = "docker pull $image"
+        $pullCommand = "${baseCommand} pull"
         Write-Verbose "[docker]: $pullCommand"
         Invoke-Expression $pullCommand
     }
@@ -137,8 +160,6 @@ function Invoke-Packages {
     $packagesLocal = Join-Path $packages 'local'
     $packagesConfig = Join-Path $packages 'nuget.config'
     $packagesTxt = Join-Path $packages 'packages.txt'
-
-    $baseDotnetCommand = "docker run --rm -a stdout -a stderr -v '${packages}:/packages' --entrypoint dotnet $image"
 
     # Configure base assets if they do not exist
     New-Item $packages -ItemType Directory -Force > $null
@@ -228,20 +249,20 @@ function Invoke-Packages {
             }
         }
         'Add Feed' {
-            $nugetCmd = " nuget add source $Uri -n $AddFeed"
+            $nugetCmd = "dotnet nuget add source $Uri -n $AddFeed"
 
             if($User) { $nugetCmd += " -u $User" }
             if($Pass) { $nugetCmd += " -p $Pass --store-password-in-clear-text" }
 
             $nugetCmd += " --configfile /packages/nuget.config"
-            $fullCmd = $baseDotnetCommand + $nugetCmd
+            $fullCmd = BuildCommand $nugetCmd
             Write-Verbose "[docker] $fullCmd"
             Invoke-Expression $fullCmd
         }
         'Remove Feed' {
-            $nugetCmd = " nuget remove source $RemoveFeed"
+            $nugetCmd = "dotnet nuget remove source $RemoveFeed"
             $nugetCmd += " --configfile /packages/nuget.config"
-            $fullCmd = $baseDotnetCommand + $nugetCmd
+            $fullCmd = BuildCommand $nugetCmd
             Write-Verbose "[docker] $fullCmd"
             Invoke-Expression $fullCmd
         }
@@ -251,10 +272,20 @@ function Invoke-Packages {
             Write-Host 'Packages cleaned'
         }
         'Restore' {
-            $envFile = Join-Path $envPath '.env'
-            $runCmd = "docker run --rm -a stdout -a stderr -v '${components}:/components' -v '${packages}:/packages' --env-file '$envFile' $image"
+            $runCmd = BuildCommand
             Write-Verbose "[docker]: $runCmd"
-            Invoke-Expression $runCmd
+            $envContext = Set-Environment @{
+                # Always set to true so that if using floating versions
+                # the restore path is fully completed.
+                CLUEDIN_INSTALLER_FORCE_RESTORE = $true
+                CLUEDIN_INSTALLER_CLEAR_CACHE = $ClearCache
+            }
+            try {
+                Invoke-Expression $runCmd
+            }
+            finally {
+                $envContext.Reset()
+            }
         }
     }
 }

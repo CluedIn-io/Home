@@ -213,10 +213,13 @@ class EnvironmentToggle {
 
 class Paths {
     static [string]$Env
+    static [string]$ClusterEnv
+    static [string]$TerraformScripts
 
     static [string] EnvironmentForContext([string] $context) {
         $result = switch ($context) {
             docker { [Paths]::Env }
+            cluster { [Paths]::ClusterEnv }
             default {
                 throw "Unknown context '$context'"
             }
@@ -227,6 +230,8 @@ class Paths {
 
     static [void] InitPaths([string] $scriptsDir) {
         [Paths]::Env              = (Get-Item ([Path]::Combine($scriptsDir, '..', 'env'))).FullName
+        [Paths]::ClusterEnv       = (Get-Item ([Path]::Combine($scriptsDir, '..', 'clusterenv'))).FullName
+        [Paths]::TerraformScripts = (Get-Item ([Path]::Combine($scriptsDir, '..', 'terraform', 'scripts'))).FullName
     }
 }
 

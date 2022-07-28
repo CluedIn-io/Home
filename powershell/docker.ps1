@@ -9,7 +9,8 @@ function DockerCompose {
         [String]$AdditionalArgs = [string]::Empty,
         [String]$Tag = [string]::Empty,
         [String[]]$TagOverride = @(),
-        [String[]]$Disable = @()
+        [String[]]$Disable = @(),
+        [Switch]$DisableData
     )
 
     $environment = $Env | FindEnvironment
@@ -23,21 +24,36 @@ function DockerCompose {
     $composeRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'docker', 'compose')
 
     $projectName = "-p cluedin_$($environment.UniqueName)"
+    $exclude = @()
+
+    # Exclude installer if start/up
+    if($action -eq 'up' -or $action -eq 'start') {
+        $exclude += @('docker-compose.installer.yml')
+    }
+
     # Only include libpostal if scale is set
-    $exclude = $null
     $libPostalReplicas = [int](GetEnvironmentValue $Env CLUEDIN_LIBPOSTAL_REPLICAS 0)
     if($libPostalReplicas -lt 1){
-        $exclude = '*libpostal*'
+        $exclude += '*libpostal*'
     }
+
+    # Exclude data if disabled
+    if($DisableData) {
+        $exclude += '*.data.yml'
+    }
+
     # Note: folder must have '*' to enable filter and exclude to work together
     $composeFiles = Get-ChildItem (Join-Path $composeRoot *) -Filter 'docker-compose*.yml' -Exclude $exclude | ForEach-Object { "-f '$($_.FullName)'" }
+
+    # Support extra docker-compose.yml inside environment folder:
+    $composeFiles += Get-ChildItem (Join-Path $envPath *) -Filter 'docker-compose*.yml' | ForEach-Object { "-f '$($_.FullName)'" }
 
     # If action is up/start - we need to make sure the data folders exist
     try {
         $defaultEnv = FindEnvironment 'default' | Select-Object -ExpandProperty FullName
         Push-Location $envPath
         if($action -eq 'up' -or $action -eq 'start'){
-            Get-ChildItem $composeRoot -Filter 'docker-compose*.yml' |
+            Get-ChildItem (Join-Path $composeRoot *) -Filter 'docker-compose*.yml' -Exclude $exclude |
                 ForEach-Object {
                     Get-Content $_ | ForEach-Object {
                         if($_ -match "^\s+source\:\s+(?<path>.+)$"){
@@ -64,9 +80,10 @@ function DockerCompose {
             # data master translog
             $sqlDataRoot = Join-Path $envPath 'data' 'sqlserver'
             $sqlDataDir = Join-Path $sqlDataRoot 'data'
-            Get-ChildItem $sqlDataDir -Exclude 'datastore.*','.initialized' | Foreach-Object { Move-Item $_ -Destination (Join-Path $sqlDataRoot 'master' $_.Name ) }
-            Get-ChildItem $sqlDataDir -Filter '*.ldf' -File | Foreach-Object { Move-Item $_ -Destination (Join-Path $sqlDataRoot 'translog' $_.Name ) }
-
+            if(Test-Path $sqlDataDir) {
+                Get-ChildItem $sqlDataDir -Exclude 'datastore.*','.initialized' | Foreach-Object { Move-Item $_ -Destination (Join-Path $sqlDataRoot 'master' $_.Name ) }
+                Get-ChildItem $sqlDataDir -Filter '*.ldf' -File | Foreach-Object { Move-Item $_ -Destination (Join-Path $sqlDataRoot 'translog' $_.Name ) }
+            }
         }
     } finally {
         Pop-Location
@@ -265,17 +282,21 @@ function Invoke-DockerComposeUp {
         # The names of services match those reported by docker when starting CluedIn
         # e.g. `-disabler server,sqlserver`
         [String[]]$Disable,
-        # when set, the latest versions of images will be pulled first.
-        [Switch]$Pull
+        # When set, the latest versions of images will be pulled first.
+        [Switch]$Pull,
+        # When set, the data folder will not be used for reading/writing data.
+        # All data will be persisted directly to the running docker image.
+        [Switch]$DisableData = $false
     )
 
     # Remove non-shared parameters
     $PSBoundParameters.Remove('Pull') > $null
     $PSBoundParameters.Remove('Disable') > $null
+    $PSBoundParameters.Remove('DisableData') > $null
 
     if($Pull) {
         DockerCompose pull @PSBoundParameters
     }
 
-    DockerCompose -Action up -Disable $Disable -AdditionalArgs '--remove-orphans -d' @PSBoundParameters
+    DockerCompose -Action up -Disable $Disable -DisableData:$DisableData -AdditionalArgs '--remove-orphans -d' @PSBoundParameters
 }

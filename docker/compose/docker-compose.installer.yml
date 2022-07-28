@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  installer:
+    user: root
+    image: cluedin/nuget-installer:${CLUEDIN_INSTALLER_TAG}
+    environment:
+      - FORCE_RESTORE=${CLUEDIN_INSTALLER_FORCE_RESTORE:-false}
+      - CLEAR_CACHE=${CLUEDIN_INSTALLER_CLEAR_CACHE:-false}
+    volumes:
+      - "./components:/components"
+      - "./packages:/packages"

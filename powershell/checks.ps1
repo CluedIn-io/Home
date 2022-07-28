@@ -223,7 +223,8 @@ function Test-InstanceStatus {
 
     Write-Host "Running CluedIn instance status" -ForegroundColor DarkYellow
     Write-Host
-    $domain  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_DOMAIN' -DefaultValue 'localhost'
+    $fallbackDomain = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_DOMAIN' -DefaultValue 'localhost'
+    $domain  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_HOST' -DefaultValue $fallbackDomain
     $port  = GetEnvironmentValue -Name $Env -Key 'CLUEDIN_SERVER_LOCALPORT' -DefaultValue '9000'
 
     $fullUri = "http://${domain}:${Port}/status"
@@ -255,8 +256,13 @@ function Test-InstanceStatus {
                 $details,
                 {
                     $info = $args[0].Data.ServiceStatus
-                    $success = $info -eq 'green'
-                    [CheckResult]::new($success, "")
+                    $success = switch ($info) {
+                        'green' { [CheckResultState]::Success }
+                        'yellow' { [CheckResultState]::Warning }
+                        'red' { [CheckResultState]::Error }
+                        default { [CheckResultState]::Warning }
+                    }
+                    [CheckResult]::new($success, [string]::Empty)
                 },
                 "Service status should be 'Green'"
             )

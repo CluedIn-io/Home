@@ -2,7 +2,7 @@ version: '3.7'
 services:
     sqlserver:
         image: cluedin/sqlserver:${CLUEDIN_SQLSERVER_TAG}
-        entrypoint: ["sh","-c","/init/init.sh"]
+        entrypoint: ["sh","-c","mkdir -p /mssql-data/data/ && /init/init.sh"]
         ports:
             - "${CLUEDIN_SQLSERVER_LOCALPORT:-1433}:1433"
         environment:
@@ -11,14 +11,4 @@ services:
             - MSSQL_LOG_DIR=/mssql-translog/translog/
             - MSSQL_MASTER_DATA_FILE=/mssql-data/master/master.mdf
             - MSSQL_MASTER_LOG_FILE=/mssql-data/master/mastlog.ldf
-        volumes:
-            - type: bind
-              source: ./data/sqlserver/data
-              target: /mssql-data/data/
-            - type: bind
-              source: ./data/sqlserver/master
-              target: /mssql-data/master/
-            - type: bind
-              source: ./data/sqlserver/translog
-              target: /mssql-translog/translog/
 

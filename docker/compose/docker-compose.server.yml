@@ -1,10 +1,5 @@
 version: '3.7'
 services:
-  installer:
-    user: root
-    image: cluedin/nuget-installer:${CLUEDIN_INSTALLER_TAG}
-    deploy:
-      replicas: 0
   server:
     user: root
     image: cluedin/cluedin-server:${CLUEDIN_SERVER_TAG}
@@ -51,7 +46,7 @@ services:
       - CLUEDIN_CONNECTIONSTRINGS__ML_LOGGING=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_CONNECTIONSTRINGS__WEBAPPSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_APPSETTINGS__AGENT_ENABLED=${CLUEDIN_AGENT_ENABLED}
-      - CLUEDIN_APPSETTINGS__MODELS_ENABLED=false
+      - CLUEDIN_APPSETTINGS__MODELS_ENABLED=${CLUEDIN_MODELS_ENABLED:-false}
       - DOTNET_ENVIRONMENT=${CLUEDIN_ENVIRONMENT}
       - CLUEDIN_APPSETTINGS__EMAILUSERNAME=${CLUEDIN_EMAIL_USER}
       - CLUEDIN_APPSETTINGS__EMAILSERVERSSL=${CLUEDIN_EMAIL_SSL}

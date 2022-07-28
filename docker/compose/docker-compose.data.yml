@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+    sqlserver:
+        volumes:
+            - type: bind
+              source: ./data/sqlserver/data
+              target: /mssql-data/data/
+            - type: bind
+              source: ./data/sqlserver/master
+              target: /mssql-data/master/
+            - type: bind
+              source: ./data/sqlserver/translog
+              target: /mssql-translog/translog/
+
+    neo4j:
+        volumes:
+            - type: bind
+              source: ./data/neo4j/data
+              target: /data
+
+    elasticsearch:
+        volumes:
+            - type: bind
+              source: ./data/elasticsearch/data
+              target: /usr/share/elasticsearch/data
+
+    smtp4dev:
+        volumes:
+            - type: bind
+              source: ./data/smtp4dev/data
+              target: /smtp4dev

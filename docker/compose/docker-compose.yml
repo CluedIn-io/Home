@@ -5,10 +5,6 @@ services:
         ports:
             - "${CLUEDIN_SMTP_HTTP_LOCALPORT:-25258}:80"
             - "${CLUEDIN_SMTP_EMAIL_LOCALPORT:-2525}:25"
-        volumes:
-            - type: bind
-              source: ./data/smtp4dev/data
-              target: /smtp4dev
     neo4j:
         image: cluedin/neo4j:${CLUEDIN_NEO4J_TAG}
         environment:
@@ -17,10 +13,7 @@ services:
         ports:
             - "${CLUEDIN_NEO4J_HTTP_LOCALPORT:-7474}:7474"
             - "${CLUEDIN_NEO4J_BOLT_LOCALPORT:-7687}:7687"
-        volumes:
-            - type: bind
-              source: ./data/neo4j/data
-              target: /data
+
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
         environment:
@@ -28,10 +21,7 @@ services:
         ports:
             - "${CLUEDIN_ELASTIC_HTTP_LOCALPORT:-9200}:9200"
             - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
-        volumes:
-            - type: bind
-              source: ./data/elasticsearch/data
-              target: /usr/share/elasticsearch/data
+
     rabbitmq:
         image: rabbitmq:3.9.7-management-alpine
         ports:

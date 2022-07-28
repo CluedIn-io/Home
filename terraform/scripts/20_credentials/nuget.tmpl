@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <add key="nuget" value="https://api.nuget.org/v3/index.json" />
+    <add key="azure" value="https://pkgs.dev.azure.com/CluedIn-io/_packaging/CluedIn/nuget/v3/index.json" />
+    <add key="develop" value="https://pkgs.dev.azure.com/CluedIn-io/_packaging/develop/nuget/v3/index.json" />
+    <add key="release" value="https://pkgs.dev.azure.com/CluedIn-io/_packaging/release/nuget/v3/index.json" />
+  </packageSources>
+  <packageSourceCredentials>
+    <azure>
+        <add key="Username" value="VSTS" />
+        <add key="ClearTextPassword" value="${pat}" />
+      </azure>
+    <develop>
+      <add key="Username" value="VSTS" />
+      <add key="ClearTextPassword" value="${pat}" />
+    </develop>
+    <release>
+      <add key="Username" value="VSTS" />
+      <add key="ClearTextPassword" value="${pat}" />
+    </release>
+  </packageSourceCredentials>
+</configuration>

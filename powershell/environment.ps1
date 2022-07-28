@@ -118,7 +118,7 @@ function Invoke-Environment {
                 }
             }
             'get' {
-                InvokeEnvironment @innerArgs -get
+                InvokeEnvironment @innerArgs
             }
             'unset' {
                 InvokeEnvironment @innerArgs -Unset $Unset
@@ -219,7 +219,7 @@ function FindEnvironment {
     )
 
     process {
-        $root = if($Context -eq 'docker') { [Paths]::Env }
+        $root = if($Context -eq 'docker') { [Paths]::Env } else { [Paths]::ClusterEnv }
 
         $envDir = Get-ChildItem $root -Filter "${Name}" -ErrorAction Ignore
 
@@ -315,7 +315,7 @@ function SetEnvironment {
         [hashtable]$Settings
     )
 
-    $root = if($Context -eq 'docker') { [Paths]::Env }
+    $root = if($Context -eq 'docker') { [Paths]::Env } else { [Paths]::ClusterEnv }
     $rootPath = Join-Path $root $Name
     if(-not (Test-Path $rootPath)) { New-Item $rootPath -ItemType Directory > $null }
     $content = $Settings.GetEnumerator() |
