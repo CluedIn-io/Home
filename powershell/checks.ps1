@@ -90,6 +90,7 @@ function Test-Environment {
         [PortCheck]::new('CluedIn Datasource Prometheus Endpoint', $envDetails.CLUEDIN_DATASOURCE_PROMETHEUS_ENDPOINT_METRICS_LOCALPORT ?? 9014, $cluedinDomain)
         [PortCheck]::new('CluedIn Datasource Prometheus File', $envDetails.CLUEDIN_DATASOURCE_PROMETHEUS_FILE_METRICS_LOCALPORT?? 9015, $cluedinDomain)
         [PortCheck]::new('CluedIn Datasource Prometheus SQL', $envDetails.CLUEDIN_DATASOURCE_PROMETHEUS_SQL_METRICS_LOCALPORT ?? 9016, $cluedinDomain)
+        [PortCheck]::new('CluedIn Documentation', $envDetails.CLUEDIN_DOCUMENTATION_LOCALPORT ?? 9021, $cluedinDomain)
         [PortCheck]::new('CluedIn Gql', $envDetails.CLUEDIN_GQL_LOCALPORT ?? 8888, $cluedinDomain)
         [PortCheck]::new('Neo4j Http', $envDetails.CLUEDIN_NEO4J_HTTP_LOCALPORT ?? 7474, 'localhost')
         [PortCheck]::new('Neo4j Bolt', $envDetails.CLUEDIN_NEO4J_BOLT_LOCALPORT ?? 7687, 'localhost')
@@ -165,6 +166,7 @@ function Test-InstanceStatus {
         cluedin_325_61ef0f49_annotation_1      docker-entrypoint.sh npm r ...   Up      0.0.0.0:9010->8888/tcp,:::9010->8888/tcp
         cluedin_325_61ef0f49_clean_1           docker-entrypoint.sh npm r ...   Up      0.0.0.0:9009->8888/tcp,:::9009->8888/tcp
         cluedin_325_61ef0f49_datasource_1      docker-entrypoint.sh npm r ...   Up      0.0.0.0:9011->8888/tcp,:::9011->8888/tcp
+        cluedin_325_61ef0f49_documentation_1   docker-entrypoint.sh npm r ...   Up      0.0.0.0:9021->8888/tcp,:::9021->8888/tcp
         cluedin_325_61ef0f49_elasticsearch_1   /tini -- /usr/local/bin/do ...   Up      0.0.0.0:9200->9200/tcp,:::9200->9200/tcp, 0.0.0.0:9300->9300/tcp,:::9300->9300/tcp
         cluedin_325_61ef0f49_gql_1             docker-entrypoint.sh npm r ...   Up      0.0.0.0:8888->8888/tcp,:::8888->8888/tcp
         cluedin_325_61ef0f49_grafana_1         /run.sh                          Up      0.0.0.0:3030->3000/tcp,:::3030->3000/tcp

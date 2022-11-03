@@ -29,3 +29,9 @@ services:
             - type: bind
               source: ./data/smtp4dev/data
               target: /smtp4dev
+
+    openrefine:
+        volumes:
+            - type: bind
+              source: ./data/openrefine/data
+              target: /data

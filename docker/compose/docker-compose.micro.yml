@@ -102,3 +102,8 @@ services:
     - rabbitmq
     - seq
     - annotation
+
+  documentation:
+    image: cluedin/cluedin-micro-documentation:${CLUEDIN_DOCUMENTATION_TAG}
+    ports:
+      - "${CLUEDIN_DOCUMENTATION_LOCALPORT:-9021}:8888"
