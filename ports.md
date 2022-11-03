@@ -20,6 +20,7 @@ be exposed on `localhost` through the _local_ port.
 | clean         | 9009       | 8888          | Clean API               |
 | annotation    | 9010       | 8888          | Annotation API          |
 | datasource    | 9011       | 8888          | DataSource API          |
+| documentation | 9021       | 8888          | Documentation API       |
 | submitter     | 9012       | 8888          | Submitter API           |
 | gql           | 8888       | 8888          | GraphQL                 |
 | ui            | 9080       | 80            | UI/System Entrypoint    |
