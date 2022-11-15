@@ -9,3 +9,4 @@ services:
     volumes:
       - "./components:/components"
       - "./packages:/packages"
+      - "./certs:/certs"
