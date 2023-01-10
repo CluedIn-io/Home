@@ -68,7 +68,7 @@ function Test-Environment {
         [Check]::new('Docker Compose', {
             $info = docker-compose version --short
             $major,$minor,$patch = $info.Trim().Split('.')
-            $success = ($major -ge 1) -and ($minor -ge 26)
+            $success = ($major -gt 1) -or (($major -ge 1) -and ($minor -ge 26))
             [CheckResult]::new($success, $info)
         }, 'You must be running docker-compose 1.26.0 or greater.')
 

@@ -1,8 +1,8 @@
 version: '3.7'
 services:
-  server:
+  server: &server
     user: root
-    image: cluedin/cluedin-server:${CLUEDIN_SERVER_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-server:${CLUEDIN_SERVER_TAG}
     environment:
       - CLUEDIN_APPSETTINGS__AGENTSERVERURL=http://${CLUEDIN_DOMAIN}:9000
       - CLUEDIN_APPSETTINGS__AUTHRETURNURL=http://${CLUEDIN_DOMAIN}:9001
@@ -29,10 +29,10 @@ services:
       - CLUEDIN_CONNECTIONSTRINGS__GRAPHSTORE_READ=http://neo4j:@${CLUEDIN_NEO4J_HOST:-neo4j}:7474/db/data
       - CLUEDIN_CONNECTIONSTRINGS__GRAPHSTORE_WRITE=http://neo4j:@${CLUEDIN_NEO4J_HOST:-neo4j}:7474/db/data
 
-      - CLUEDIN_CONNECTIONSTRINGS__MESSAGEBUS=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=${CLUEDIN_RABBITMQ_USERNAME:-guest};password=${CLUEDIN_RABBITMQ_PASSWORD:-guest};product=CluedIn
-      - CLUEDIN_CONNECTIONSTRINGS__MESSAGEBUSMANAGEMENT=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=${CLUEDIN_RABBITMQ_USERNAME:-guest};password=${CLUEDIN_RABBITMQ_PASSWORD:-guest};product=CluedIn
+      - CLUEDIN_CONNECTIONSTRINGS__MESSAGEBUS=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=${CLUEDIN_RABBITMQ_USERNAME:-cluedin};password=${CLUEDIN_RABBITMQ_PASSWORD:-cluedin};product=CluedIn
+      - CLUEDIN_CONNECTIONSTRINGS__MESSAGEBUSMANAGEMENT=host=${CLUEDIN_RABBITMQ_HOST:-rabbitmq};username=${CLUEDIN_RABBITMQ_USERNAME:-cluedin};password=${CLUEDIN_RABBITMQ_PASSWORD:-cluedin};product=CluedIn
       - CLUEDIN_CONNECTIONSTRINGS__SEARCHSTORE=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
-      - CLUEDIN_CONNECTIONSTRINGS__SIGNALRSCALEOUT=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+      - CLUEDIN_CONNECTIONSTRINGS__SIGNALRSCALEOUT=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
 
       - CLUEDIN_CONNECTIONSTRINGS__AUTHENTICATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_CONNECTIONSTRINGS__AUDITLOG=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.AuditLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
@@ -80,3 +80,9 @@ services:
       - redis
       - seq
       - sqlserver
+
+  server-extra:
+    <<: *server
+    ports: []
+    deploy:
+      replicas: ${CLUEDIN_SERVER_EXTRA_REPLICAS:-0}

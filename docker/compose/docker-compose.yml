@@ -1,12 +1,12 @@
 version: '3.7'
 services:
     smtp4dev:
-        image: rnwood/smtp4dev:latest
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/rnwood/smtp4dev:latest
         ports:
             - "${CLUEDIN_SMTP_HTTP_LOCALPORT:-25258}:80"
             - "${CLUEDIN_SMTP_EMAIL_LOCALPORT:-2525}:25"
     neo4j:
-        image: cluedin/neo4j:${CLUEDIN_NEO4J_TAG}
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/neo4j:${CLUEDIN_NEO4J_TAG}
         environment:
             - NEO4J_AUTH=none
             - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
@@ -15,7 +15,7 @@ services:
             - "${CLUEDIN_NEO4J_BOLT_LOCALPORT:-7687}:7687"
 
     elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.8.0
         environment:
             - discovery.type=single-node
         ports:
@@ -23,36 +23,38 @@ services:
             - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
 
     rabbitmq:
-        image: rabbitmq:3.9.7-management-alpine
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/rabbitmq:3.10.8-debian-11-r4
         ports:
             - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
             - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
             - "${CLUEDIN_RABBITMQ_METRICS_LOCALPORT:-15692}:15692"
         environment:
-            - RABBITMQ_DEFAULT_USER=${CLUEDIN_RABBITMQ_USERNAME:-guest}
-            - RABBITMQ_DEFAULT_PASS=${CLUEDIN_RABBITMQ_PASSWORD:-guest}
+            - RABBITMQ_USERNAME=${CLUEDIN_RABBITMQ_USERNAME:-cluedin}
+            - RABBITMQ_PASSWORD=${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}
         hostname: cluedin-dev
         volumes:
             - type: bind
               source: ./prometheus/rabbitmq.conf
               target: /etc/rabbitmq/conf.d/rabbitmq.conf
     redis:
-        image: redis:5.0-alpine
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/redis:6.2.7-debian-11-r11
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
         ports:
             - "${CLUEDIN_REDIS_LOCALPORT:-6379}:6379"
     seq:
-        image: datalust/seq:latest
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/datalust/seq:2022.1
         environment:
             ACCEPT_EULA: 'Y'
         ports:
             - "${CLUEDIN_SEQ_UI_LOCALPORT:-3200}:80"
             - "${CLUEDIN_SEQ_DATA_LOCALPORT:-5341}:5341"
     openrefine:
-        image: cluedin/openrefine:${CLUEDIN_OPENREFINE_TAG}
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/openrefine:${CLUEDIN_OPENREFINE_TAG}
         ports:
             - "${CLUEDIN_OPENREFINE_LOCALPORT:-3333}:3333"
     prometheus:
-        image: prom/prometheus:latest
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/prometheus/prometheus:v2.37.0
         deploy:
             replicas: ${CLUEDIN_PROMETHEUS_SCALE_COUNT:-0}
         ports:
@@ -63,7 +65,7 @@ services:
               target: /etc/prometheus/prometheus.yml
         command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
     grafana:
-        image: grafana/grafana:latest
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/grafana/grafana:9.1.4
         environment:
             - GF_AUTH_ANONYMOUS_ENABLED=true
             - GF_SECURITY_ALLOW_EMBEDDING=true
@@ -96,7 +98,7 @@ services:
               source: ./grafana/cadvisor-global.json
               target: /var/lib/grafana/dashboards/cadvisor-global.json
     cadvisor:
-        image: gcr.io/cadvisor/cadvisor:latest
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cadvisor/cadvisor:latest
         ports:
             - "8484:8080"
         volumes:

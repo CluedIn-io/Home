@@ -2,10 +2,10 @@ version: '3.7'
 services:
   clean:
     user: root
-    image: cluedin/cluedin-micro-clean:${CLUEDIN_CLEAN_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-clean:${CLUEDIN_CLEAN_TAG}
     environment:
     - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
-    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
     - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
     - SeqLoggingLevel=debug
@@ -30,10 +30,10 @@ services:
 
   annotation:
     user: root
-    image: cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
     environment:
     - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
-    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
     - DbPassword=${CLUEDIN_SQLSERVER_PASS}
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
@@ -54,9 +54,9 @@ services:
 
   datasource:
     user: root
-    image: cluedin/cluedin-micro-datasource:${CLUEDIN_DATASOURCE_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-datasource:${CLUEDIN_DATASOURCE_TAG}
     environment:
-    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
     - DbName=${CLUEDIN_DATASOURCE_DBNAME:-DataStore.Db.MicroServices}
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
@@ -81,10 +81,10 @@ services:
     - seq
 
   submitter:
-    image: cluedin/cluedin-micro-submitter-node:${CLUEDIN_SUBMITTER_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-submitter-node:${CLUEDIN_SUBMITTER_TAG}
     environment:
       CluedIn_API_URL: ${CLUEDIN_SUBMITTER_CLUE_API_URL:-/api/v2/clue?save=true}
-      RabbitMQ_CS: "amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
+      RabbitMQ_CS: "amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
       Serilog__WriteTo__1__Name: Seq
       Serilog__WriteTo__1__Args__serverUrl: http://${CLUEDIN_SEQ_HOST:-seq}:5341
       Serilog__WriteTo__1__Args__controlLevelSwitch: "$$controlSwitch"
@@ -104,6 +104,6 @@ services:
     - annotation
 
   documentation:
-    image: cluedin/cluedin-micro-documentation:${CLUEDIN_DOCUMENTATION_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-documentation:${CLUEDIN_DOCUMENTATION_TAG}
     ports:
       - "${CLUEDIN_DOCUMENTATION_LOCALPORT:-9021}:8888"

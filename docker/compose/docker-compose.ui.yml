@@ -2,7 +2,7 @@ version: '3.7'
 services:
   ui:
     user: root
-    image: cluedin/ui:${CLUEDIN_UI_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/ui:${CLUEDIN_UI_TAG}
     ports:
     - "${CLUEDIN_UI_LOCALPORT:-9080}:8080"
     environment:
@@ -24,7 +24,7 @@ services:
     - server
   gql:
     user: root
-    image: cluedin/cluedin-ui-gql:${CLUEDIN_GQL_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-ui-gql:${CLUEDIN_GQL_TAG}
     environment:
         - "AUTH_API=http://${CLUEDIN_SERVER_HOST:-server}:9001/"
         - "WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/"
@@ -38,7 +38,7 @@ services:
         - "WEBHOOKS_URL=http://${CLUEDIN_SERVER_HOST:-server}:9006/"
         - "NODE_ENV=${CLUEDIN_ENVIRONMENT}"
         - "RabbitMQ_Notification_Channel=Notifications"
-        - "RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-guest}:${CLUEDIN_RABBITMQ_PASSWORD:-guest}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
+        - "RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
         - "DbHost=${CLUEDIN_SQLSERVER_HOST}"
         - "DbPassword=${CLUEDIN_SQLSERVER_PASS}"
         - "DbUserName=${CLUEDIN_SQLSERVER_USER}"
