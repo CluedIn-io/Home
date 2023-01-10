@@ -13,7 +13,7 @@ This is the starting point for getting a brand new instance of CluedIn up and ru
 - [Docker](https://www.docker.com/products/docker-desktop)
 - [Docker-compose](https://docs.docker.com/compose/) (installed with Docker)
 - [PowerShell 7+](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7)
-- Access to [CluedIn DockerHub](https://hub.docker.com/orgs/cluedin) repositories (to download CluedIn container images)
+- Access to CluedIn ACR (Azure Container Registry) (to download CluedIn container images)
 - [Git](https://git-scm.com/)
 
 ### Execution policy
