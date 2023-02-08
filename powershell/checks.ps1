@@ -68,9 +68,9 @@ function Test-Environment {
         [Check]::new('Docker Compose', {
             $info = docker-compose version --short
             $major,$minor,$patch = $info.Trim().Split('.')
-            $success = ($major -gt 1) -or (($major -ge 1) -and ($minor -ge 26))
+            $success = ($major -ge 2)
             [CheckResult]::new($success, $info)
-        }, 'You must be running docker-compose 1.26.0 or greater.')
+        }, 'You must be running docker-compose v2 or greater. Ensure this is enabled in docker desktop.')
 
     ))
 
@@ -102,7 +102,7 @@ function Test-Environment {
         [PortCheck]::new('Seq UI', $envDetails.CLUEDIN_SEQ_UI_LOCALPORT ?? 3200, 'localhost')
         [PortCheck]::new('Seq Data', $envDetails.CLUEDIN_SEQ_DATA_LOCALPORT ?? 5341, 'localhost')
         [PortCheck]::new('SMTP UI', $envDetails.CLUEDIN_SMTP_HTTP_LOCALPORT ?? 25258, 'localhost')
-        [PortCheck]::new('SMTP Email', $envDetails.CLUEDIN_EMAIL_PORTT ?? 2525, 'localhost')
+        [PortCheck]::new('SMTP Email', $envDetails.CLUEDIN_EMAIL_PORT ?? 2525, 'localhost')
         [PortCheck]::new('Sql Server', $envDetails.CLUEDIN_SQLSERVER_LOCALPORT ?? 1433, 'localhost')
         [PortCheck]::new('OpenRefine', $envDetails.CLUEDIN_OPENREFINE_LOCALPORT ?? 3333, 'localhost')
     ))

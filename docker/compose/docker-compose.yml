@@ -36,6 +36,9 @@ services:
             - type: bind
               source: ./prometheus/rabbitmq.conf
               target: /etc/rabbitmq/conf.d/rabbitmq.conf
+            - type: bind
+              source: ./prometheus/plugins.conf
+              target: /etc/rabbitmq/enabled_plugins
     redis:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/redis:6.2.7-debian-11-r11
         environment:
@@ -108,3 +111,7 @@ services:
             - /var/lib/docker/:/var/lib/docker:ro
         depends_on:
             - sqlserver
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 5s

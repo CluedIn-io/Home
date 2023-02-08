@@ -80,6 +80,10 @@ services:
       - redis
       - seq
       - sqlserver
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
 
   server-extra:
     <<: *server

@@ -15,8 +15,8 @@ scrape_configs:
   metrics_path: "/metrics"
   static_configs:
   - targets:
-    - host.docker.internal:9013
     - host.docker.internal:9010
+    - host.docker.internal:9013
     - host.docker.internal:9014
     - host.docker.internal:9015
     - host.docker.internal:9016

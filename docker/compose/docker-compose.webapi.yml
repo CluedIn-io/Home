@@ -31,5 +31,9 @@ services:
         - seq
         - redis
         - sqlserver
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 5s
         ports:
         - "${CLUEDIN_WEBAPI_LOCALPORT:-9008}:9008"

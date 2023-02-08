@@ -27,6 +27,10 @@ services:
     - seq
     - annotation
     - datasource
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
 
   annotation:
     user: root
@@ -50,6 +54,10 @@ services:
     - sqlserver
     - seq
     - datasource
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
 
 
   datasource:
@@ -79,6 +87,10 @@ services:
     - rabbitmq
     - sqlserver
     - seq
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
 
   submitter:
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-submitter-node:${CLUEDIN_SUBMITTER_TAG}
@@ -102,6 +114,10 @@ services:
     - rabbitmq
     - seq
     - annotation
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
 
   documentation:
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-documentation:${CLUEDIN_DOCUMENTATION_TAG}

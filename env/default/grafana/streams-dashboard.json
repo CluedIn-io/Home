@@ -1057,7 +1057,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "rate(StreamFetchEntity{StreamID=\"${Stream}\"}[1m])",
+          "expr": "increase(StreamExceptionCount{StreamID=\"${Stream}\"}[1m])",
           "interval": "",
           "legendFormat": "Exceptions per minute",
           "refId": "A"
