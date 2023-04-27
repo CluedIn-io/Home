@@ -12,7 +12,7 @@ services:
       - CLUEDIN_APPSETTINGS__NOTIFICATIONS_ADMINNOTIFICATIONS_RECIPIENT=admin@foobar.com
       - CLUEDIN_APPSETTINGS__PUBLICSERVERURL=http://*:9007
       - CLUEDIN_APPSETTINGS__SEQ_URL=http://${CLUEDIN_SEQ_HOST:-seq}
-      - CLUEDIN_APPSETTINGS__SERVERBLOBURL=http://*:9000
+      - CLUEDIN_APPSETTINGS__SERVERBLOBURL=http://${CLUEDIN_DOMAIN}:9000
       - CLUEDIN_APPSETTINGS__SERVERPUBLICAPIURL=http://*:9007
       - CLUEDIN_APPSETTINGS__SERVERRETURNURL=http://${CLUEDIN_DOMAIN}:9000
       - CLUEDIN_APPSETTINGS__SERVERURL=http://*:9000
@@ -82,7 +82,7 @@ services:
       - sqlserver
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
 
   server-extra:

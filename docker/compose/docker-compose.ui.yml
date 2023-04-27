@@ -24,7 +24,7 @@ services:
     - server
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
   gql:
     user: root
@@ -67,5 +67,5 @@ services:
     - sqlserver
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s

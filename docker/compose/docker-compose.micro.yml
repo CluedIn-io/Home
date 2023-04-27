@@ -29,7 +29,7 @@ services:
     - datasource
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
 
   annotation:
@@ -37,6 +37,7 @@ services:
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
     environment:
     - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
+    - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
     - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - DbHost=${CLUEDIN_SQLSERVER_HOST}
     - DbPassword=${CLUEDIN_SQLSERVER_PASS}
@@ -56,7 +57,7 @@ services:
     - datasource
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
 
 
@@ -89,7 +90,7 @@ services:
     - seq
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
 
   submitter:
@@ -116,7 +117,7 @@ services:
     - annotation
     deploy:
       restart_policy:
-        condition: always
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
 
   documentation:
