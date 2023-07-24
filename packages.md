@@ -35,7 +35,6 @@ Setting 'CLUEDIN_SERVER_TAG' in 'custom' environment
 Setting 'CLUEDIN_SQLSERVER_TAG' in 'custom' environment
 Setting 'CLUEDIN_SUBMITTER_TAG' in 'custom' environment
 Setting 'CLUEDIN_UI_TAG' in 'custom' environment
-Setting 'CLUEDIN_WEBAPI_TAG' in 'custom' environment
 ```
 
 ### 2. Add a reference to your package

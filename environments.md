@@ -30,7 +30,6 @@ Setting 'CLUEDIN_SERVER_TAG' in '323' environment
 Setting 'CLUEDIN_SQLSERVER_TAG' in '323' environment
 Setting 'CLUEDIN_SUBMITTER_TAG' in '323' environment
 Setting 'CLUEDIN_UI_TAG' in '323' environment
-Setting 'CLUEDIN_WEBAPI_TAG' in '323' environment
 ```
 
 ## How to use Environments
