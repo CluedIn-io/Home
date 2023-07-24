@@ -47,6 +47,7 @@ services:
       - CLUEDIN_CONNECTIONSTRINGS__WEBAPPSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_CONNECTIONSTRINGS__MICROSERVICES=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.MicroServices;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_CONNECTIONSTRINGS__CLEANCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.CleanCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_CONNECTIONSTRINGS__INVITATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_APPSETTINGS__AGENT_ENABLED=${CLUEDIN_AGENT_ENABLED}
       - CLUEDIN_APPSETTINGS__MODELS_ENABLED=${CLUEDIN_MODELS_ENABLED:-false}
       - DOTNET_ENVIRONMENT=${CLUEDIN_ENVIRONMENT}

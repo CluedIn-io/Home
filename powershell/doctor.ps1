@@ -209,7 +209,7 @@ function Invoke-ClusterDoctor
     $statefulSets = @()
 
     $deployments320 = @("$prefix-webapi","$prefix-ui","$prefix-clean","$prefix-gql","$prefix-datasource","$prefix-annotation","$prefix-cluedin","$prefix-submitter")
-    $deployments322 = @('cluedin-webapi','cluedin-ui','cluedin-prepare','cluedin-gql','cluedin-datasource','cluedin-annotation','cluedin-controller','cluedin-server','cluedin-submitter')
+    $deployments322 = @('cluedin-ui','cluedin-prepare','cluedin-gql','cluedin-datasource','cluedin-annotation','cluedin-controller','cluedin-server','cluedin-submitter')
 
     if($cluedinVersion -eq 320)
     {

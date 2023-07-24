@@ -81,7 +81,6 @@ function Test-Environment {
         [PortCheck]::new('CluedIn Jobs', $envDetails.CLUEDIN_SERVER_JOB_LOCALPORT ?? 9003, $cluedinDomain)
         [PortCheck]::new('CluedIn WebHooks', $envDetails.CLUEDIN_SERVER_WEBHOOK_LOCALPORT ?? 9006, $cluedinDomain)
         [PortCheck]::new('CluedIn Public', $envDetails.CLUEDIN_SERVER_PUBLIC_LOCALPORT ?? 9007, $cluedinDomain)
-        [PortCheck]::new('CluedIn Web Api', $envDetails.CLUEDIN_WEBAPI_LOCALPORT ?? 9008, $cluedinDomain)
         [PortCheck]::new('CluedIn Clean', $envDetails.CLUEDIN_CLEAN_LOCALPORT ?? 9009, $cluedinDomain)
         [PortCheck]::new('CluedIn Annotation', $envDetails.CLUEDIN_ANNOTATION_LOCALPORT ?? 9010, $cluedinDomain)
         [PortCheck]::new('CluedIn Datasource', $envDetails.CLUEDIN_DATASOURCE_LOCALPORT ?? 9011, $cluedinDomain)
@@ -181,7 +180,6 @@ function Test-InstanceStatus {
         cluedin_325_61ef0f49_sqlserver_1       sh -c /init/init.sh              Up      0.0.0.0:1433->1433/tcp,:::1433->1433/tcp
         cluedin_325_61ef0f49_submitter_1       dotnet CluedIn.MicroServic ...   Up      0.0.0.0:9012->8888/tcp,:::9012->8888/tcp
         cluedin_325_61ef0f49_ui_1              /docker-entrypoint.sh /ent ...   Up      80/tcp, 0.0.0.0:9080->8080/tcp,:::9080->8080/tcp
-        cluedin_325_61ef0f49_webapi_1          dotnet CluedIn.App.dll           Up      0.0.0.0:9008->9008/tcp,:::9008->9008/tcp
 
         Running CluedIn instance status
 

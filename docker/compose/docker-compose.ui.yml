@@ -20,6 +20,7 @@ services:
     - REACT_APP_UI_MAIN_DOMAIN=${CLUEDIN_DOMAIN}:${CLUEDIN_UI_LOCALPORT:-9080}
     - REACT_APP_UI_PROTOCOL=http://
     - REACT_APP_UI_UPLOAD_LIMIT=${CLUEDIN_UI_UPLOAD_LIMIT:-1gb}
+    - REACT_APP_UI_CLUEDIN_PUBLICAPI_URL=http://localhost:9007
     depends_on:
     - server
     deploy:
@@ -37,7 +38,6 @@ services:
         - "MICRO_DATASOURCE_URL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-8888}"
         - "MICRO_SUBMITTER_URL=http://${CLUEDIN_SUBMITTER_HOST:-submitter}:${CLUEDIN_SUBMITTER_PORT:-9012}"
         - "MICRO_DOCUMENTATION_URL=http://${CLUEDIN_DOCUMENTATION_HOST:-documentation}:${CLUEDIN_DOCUMENTATION_PORT:-8888}"
-        - "APP_API_URL=http://${CLUEDIN_WEBAPI_HOST:-webapi}:9008/"
         - "PUBLIC_API=http://${CLUEDIN_SERVER_HOST:-server}:9007/"
         - "WEBHOOKS_URL=http://${CLUEDIN_SERVER_HOST:-server}:9006/"
         - "NODE_ENV=${CLUEDIN_ENVIRONMENT}"
@@ -63,7 +63,6 @@ services:
     - annotation
     - clean
     - datasource
-    - webapi
     - sqlserver
     deploy:
       restart_policy:

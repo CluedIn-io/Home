@@ -314,14 +314,9 @@
             "selected": false,
             "text": "ui",
             "value": "ui"
-          },
-          {
-            "selected": false,
-            "text": "webapi",
-            "value": "webapi"
           }
         ],
-        "query": "annotation,clean,datasource,elasticsearch,grafana,neo4j,openrefine,prometheus,rabbitmq,redis,seq,server,sqlserver,submitter,ui,webapi",
+        "query": "annotation,clean,datasource,elasticsearch,grafana,neo4j,openrefine,prometheus,rabbitmq,redis,seq,server,sqlserver,submitter,ui",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"

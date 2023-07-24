@@ -142,11 +142,6 @@ variable "cluedin_ui_image_version" {
   type = string
 }
 
-variable "cluedin_webapi_image_version" {
-  default = ""
-  type = string
-}
-
 variable "cluedin_init_neo4j_image_version" {
   default = ""
   type = string
@@ -516,18 +511,6 @@ resource "helm_release" "cluedin-application" {
 
   set {
     name = "ui.image.pullPolicy"
-    value = var.cluedin_image_pull_policy
-  }
-
-  # WEBAPI SETTINGS
-
-  set {
-    name = "webapi.image.tag"
-    value = var.cluedin_webapi_image_version != "" ? var.cluedin_webapi_image_version : var.cluedin_image_version
-  }
-
-  set {
-    name = "webapi.image.pullPolicy"
     value = var.cluedin_image_pull_policy
   }
 
