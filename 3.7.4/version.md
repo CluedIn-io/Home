@@ -1,6 +1,6 @@
 ---
-parent: v3.7.4
 title: version
+parent: v3.7.4
 ---
 
 # version
