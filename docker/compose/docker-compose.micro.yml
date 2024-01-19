@@ -15,9 +15,10 @@ services:
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
     - DbName=${CLUEDIN_CLEAN_DBNAME:-DataStore.Db.MicroServices}
     - ForceTableCreation=${CLUEDIN_CLEAN_FORCETABLECREATION:-false}
-    - AnnotationURL=http://${CLUEDIN_ANNOTATION_HOST:-annotation}:${CLUEDIN_ANNOTATION_PORT:-8888}
-    - DataSourceURL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-8888}
+    - AnnotationURL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-9011}
+    - DataSourceURL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-9011}
     - NODE_ENV=${CLUEDIN_ENVIRONMENT}
+    - MAX_JSON_PAYLOAD_REST=${CLUEDIN_DATASOURCE_MAX_JSON_PAYLOAD_REST:-100000kb}
     ports:
       - "${CLUEDIN_CLEAN_LOCALPORT:-9009}:8888"
     depends_on:
@@ -25,45 +26,15 @@ services:
     - rabbitmq
     - sqlserver
     - seq
-    - annotation
     - datasource
     deploy:
       restart_policy:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
-
-  annotation:
-    user: root
-    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-annotation:${CLUEDIN_ANNOTATION_TAG}
-    environment:
-    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
-    - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
-    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
-    - DbHost=${CLUEDIN_SQLSERVER_HOST}
-    - DbPassword=${CLUEDIN_SQLSERVER_PASS}
-    - DbUserName=${CLUEDIN_SQLSERVER_USER}
-    - DbName=${CLUEDIN_ANNOTATION_DBNAME:-DataStore.Db.MicroServices}
-    - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
-    - SeqLoggingLevel=debug
-    - ForceTableCreation=${CLUEDIN_ANNOTATION_FORCETABLECREATION:-false}
-    - NODE_ENV=${CLUEDIN_ENVIRONMENT}
-    - MICRO_DATASOURCE_URL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-8888}
-    ports:
-      - "${CLUEDIN_ANNOTATION_LOCALPORT:-9010}:8888"
-    depends_on:
-    - rabbitmq
-    - sqlserver
-    - seq
-    - datasource
-    deploy:
-      restart_policy:
-        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
-        delay: 5s
-
 
   datasource:
     user: root
-    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-datasource:${CLUEDIN_DATASOURCE_TAG}
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/data-source:${CLUEDIN_DATASOURCE_TAG}
     environment:
     - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
     - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
@@ -73,16 +44,79 @@ services:
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
     - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
     - SeqLoggingLevel=debug
-    - AnnotationURL=http://${CLUEDIN_ANNOTATION_HOST:-annotation}:${CLUEDIN_ANNOTATION_PORT:-8888}/
     - ConsoleLoggingLevel=info
-    - ForceTableCreation=${CLUEDIN_DATASOURCE_FORCETABLECREATION:-false}
-    - NODE_ENV=${CLUEDIN_ENVIRONMENT}
-    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
+    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000
+    - DataSourceHost=${CLUEDIN_DATASOURCE_HOST:-datasource}
+    - DataSourcePort=${CLUEDIN_DATASOURCE_PORT:-9011}
+    - TMP_FILES_PATH=/shared
     ports:
-      - "${CLUEDIN_DATASOURCE_LOCALPORT:-9011}:8888"
-      - "${CLUEDIN_DATASOURCE_PROMETHEUS_ENDPOINT_METRICS_LOCALPORT:-9014}:9014"
-      - "${CLUEDIN_DATASOURCE_PROMETHEUS_FILE_METRICS_LOCALPORT:-9015}:9015"
-      - "${CLUEDIN_DATASOURCE_PROMETHEUS_SQL_METRICS_LOCALPORT:-9016}:9016"
+      - "${CLUEDIN_DATASOURCE_LOCALPORT:-9011}:9011"
+    depends_on:
+    - rabbitmq
+    - sqlserver
+    - seq
+    - elasticsearch
+    deploy:
+      restart_policy:
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
+        delay: 5s
+    volumes:
+      - datasource:/shared
+
+  datasource-processing:
+    user: root
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/data-source-processing:${CLUEDIN_DATASOURCEPROCESSING_TAG}
+    environment:
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
+    - DbName=${CLUEDIN_DATASOURCE_DBNAME:-DataStore.Db.MicroServices}
+    - DbHost=${CLUEDIN_SQLSERVER_HOST}
+    - DbPassword=${CLUEDIN_SQLSERVER_PASS}
+    - DbUserName=${CLUEDIN_SQLSERVER_USER}
+    - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
+    - SeqLoggingLevel=debug
+    - ConsoleLoggingLevel=info
+    - DataSourceProcessingHost=${CLUEDIN_DATASOURCEPROCESSING_HOST:-datasource-processing}
+    - DataSourceProcessingPort=${CLUEDIN_DATASOURCEPROCESSING_LOCALPORT:-5757}
+    - DataSourceProcessingNumOfDataLoadingWorkers=1
+    - DataSourceProcessingNumOfIngestionWorkers=1
+    - DataSourceProcessingNumOfMappingWorkers=1
+    - DataSourceProcessingNumOfFileRecoveryWorkers=1
+    - TMP_FILES_PATH=/shared
+    ports:
+      - "${CLUEDIN_DATASOURCEPROCESSING_LOCALPORT:-5757}:8888"
+    depends_on:
+    - elasticsearch
+    - rabbitmq
+    - sqlserver
+    - seq
+    deploy:
+      restart_policy:
+        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
+        delay: 5s
+    volumes:
+      - datasource:/shared
+
+  datasource-submitter:
+    user: root
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/data-source-submitter:${CLUEDIN_DATASOURCESUBMITTER_TAG}
+    environment:
+    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
+    - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
+    - DbName=${CLUEDIN_DATASOURCE_DBNAME:-DataStore.Db.MicroServices}
+    - DbHost=${CLUEDIN_SQLSERVER_HOST}
+    - DbPassword=${CLUEDIN_SQLSERVER_PASS}
+    - DbUserName=${CLUEDIN_SQLSERVER_USER}
+    - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
+    - SeqLoggingLevel=debug
+    - ConsoleLoggingLevel=info
+    - DataSourceSubmitterPort=${CLUEDIN_DATASOURCESUBMITTER_LOCALPORT:-9012}
+    - PUBLIC_WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9007
+    - CluedIn_API_URL=${CLUEDIN_DATASOURCESUBMITTER_CLUE_API_URL:-/api/v2/clue?save=true}
+    - DataSourceSubmitterHost=${CLUEDIN_DATASOURCESUBMITTER_HOST:-datasource-submitter}
+    - DataSourceSubmitterWORKERS_NUMBER=4
+    ports:
+      - "${CLUEDIN_DATASOURCESUBMITTER_LOCALPORT:-9012}:8888"
     depends_on:
     - elasticsearch
     - rabbitmq
@@ -93,34 +127,5 @@ services:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
 
-  submitter:
-    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-submitter-node:${CLUEDIN_SUBMITTER_TAG}
-    environment:
-      CluedIn_API_URL: ${CLUEDIN_SUBMITTER_CLUE_API_URL:-/api/v2/clue?save=true}
-      RabbitMQ_CS: "amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672"
-      Serilog__WriteTo__1__Name: Seq
-      Serilog__WriteTo__1__Args__serverUrl: http://${CLUEDIN_SEQ_HOST:-seq}:5341
-      Serilog__WriteTo__1__Args__controlLevelSwitch: "$$controlSwitch"
-      DbName: ${CLUEDIN_DATASOURCE_DBNAME:-DataStore.Db.MicroServices}
-      DbHost: ${CLUEDIN_SQLSERVER_HOST}
-      DbPassword: ${CLUEDIN_SQLSERVER_PASS}
-      DbUserName: ${CLUEDIN_SQLSERVER_USER}
-      MICRO_DATASOURCE_URL: http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-8888}
-      APP_API_URL: http://${CLUEDIN_SERVER_HOST:-server}:9007
-      WORKERS_NUMBER: 4
-      DISABLE_SUBMISSION_REPORT: 'false'
-    ports:
-      - "${CLUEDIN_SUBMITTER_LOCALPORT:-9012}:8888"
-    depends_on:
-    - rabbitmq
-    - seq
-    - annotation
-    deploy:
-      restart_policy:
-        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
-        delay: 5s
-
-  documentation:
-    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-documentation:${CLUEDIN_DOCUMENTATION_TAG}
-    ports:
-      - "${CLUEDIN_DOCUMENTATION_LOCALPORT:-9021}:8888"
+volumes:
+  datasource:

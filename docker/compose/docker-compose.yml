@@ -6,10 +6,11 @@ services:
             - "${CLUEDIN_SMTP_HTTP_LOCALPORT:-25258}:80"
             - "${CLUEDIN_SMTP_EMAIL_LOCALPORT:-2525}:25"
     neo4j:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/neo4j:${CLUEDIN_NEO4J_TAG}
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/neo4j-home:${CLUEDIN_NEO4J_TAG}
         environment:
             - NEO4J_AUTH=none
             - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+            - NEO4J_initial_dbms_default__database=graph.db
         ports:
             - "${CLUEDIN_NEO4J_HTTP_LOCALPORT:-7474}:7474"
             - "${CLUEDIN_NEO4J_BOLT_LOCALPORT:-7687}:7687"
@@ -23,7 +24,7 @@ services:
             - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
 
     rabbitmq:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/rabbitmq:3.10.8-debian-11-r4
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/rabbitmq:3.12.2-debian-11-r25
         ports:
             - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
             - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
@@ -68,7 +69,7 @@ services:
               target: /etc/prometheus/prometheus.yml
         command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
     grafana:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/grafana/grafana:9.1.4
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/grafana/grafana:8.4.7
         environment:
             - GF_AUTH_ANONYMOUS_ENABLED=true
             - GF_SECURITY_ALLOW_EMBEDDING=true
@@ -100,6 +101,33 @@ services:
             - type: bind
               source: ./grafana/cadvisor-global.json
               target: /var/lib/grafana/dashboards/cadvisor-global.json
+            - type: bind
+              source: ./grafana/profiling/boolean-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/boolean-vocabulary-key.json
+            - type: bind
+              source: ./grafana/profiling/datetime-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/datetime-vocabulary-key.json
+            - type: bind
+              source: ./grafana/profiling/untyped-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/untyped-vocabulary-key.json
+            - type: bind
+              source: ./grafana/profiling/float-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/float-vocabulary-key.json
+            - type: bind
+              source: ./grafana/profiling/money-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/money-vocabulary-key.json
+            - type: bind
+              source: ./grafana/profiling/text-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/text-vocabulary-key.json
+            - type: bind
+              source: ./grafana/profiling/processing-over-time.json
+              target: /var/lib/grafana/dashboards/profiling/processing-over-time.json
+            - type: bind
+              source: ./grafana/profiling/general-stats.json
+              target: /var/lib/grafana/dashboards/profiling/general-stats.json
+            - type: bind
+              source: ./grafana/profiling/unmapped-vocabulary-key.json
+              target: /var/lib/grafana/dashboards/profiling/unmapped-vocabulary-key.json
     cadvisor:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cadvisor/cadvisor:latest
         ports:

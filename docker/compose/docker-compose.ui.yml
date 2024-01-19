@@ -21,6 +21,7 @@ services:
     - REACT_APP_UI_PROTOCOL=http://
     - REACT_APP_UI_UPLOAD_LIMIT=${CLUEDIN_UI_UPLOAD_LIMIT:-1gb}
     - REACT_APP_UI_CLUEDIN_PUBLICAPI_URL=http://localhost:9007
+    - REACT_APP_UI_CLUEDIN_COPILOTHUB_URL=http://localhost:9000/hub/copilot
     depends_on:
     - server
     deploy:
@@ -34,9 +35,8 @@ services:
         - "AUTH_API=http://${CLUEDIN_SERVER_HOST:-server}:9001/"
         - "WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/"
         - "MICRO_CLEAN_URL=http://${CLUEDIN_CLEAN_HOST:-clean}:${CLUEDIN_CLEAN_PORT:-8888}"
-        - "MICRO_ANNOTATION_URL=http://${CLUEDIN_ANNOTATION_HOST:-annotation}:${CLUEDIN_ANNOTATION_PORT:-8888}"
-        - "MICRO_DATASOURCE_URL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-8888}"
-        - "MICRO_SUBMITTER_URL=http://${CLUEDIN_SUBMITTER_HOST:-submitter}:${CLUEDIN_SUBMITTER_PORT:-9012}"
+        - "MICRO_DATASOURCE_URL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-9011}"
+        - "MICRO_SUBMITTER_URL=http://${CLUEDIN_DATASOURCESUBMITTER_HOST:-datasource-submitter}:${CLUEDIN_DATASOURCESUBMITTER_PORT:-9012}"
         - "MICRO_DOCUMENTATION_URL=http://${CLUEDIN_DOCUMENTATION_HOST:-documentation}:${CLUEDIN_DOCUMENTATION_PORT:-8888}"
         - "PUBLIC_API=http://${CLUEDIN_SERVER_HOST:-server}:9007/"
         - "WEBHOOKS_URL=http://${CLUEDIN_SERVER_HOST:-server}:9006/"
@@ -57,12 +57,14 @@ services:
         - "ENGINE_ROOM_STREAM_DASHBOARD_ID=h0W9h3knk"
         - "ENGINE_ROOM_STREAM_DASHBOARD_NAME=streams"
         - "UPLOAD_LIMIT=${CLUEDIN_UI_UPLOAD_LIMIT:-1gb}"
+        - "ENABLE_DEVELOPMENT_FEATURES=true"
     ports:
     - "${CLUEDIN_GQL_LOCALPORT:-8888}:8888"
     depends_on:
-    - annotation
     - clean
     - datasource
+    - datasource-processing
+    - datasource-submitter
     - sqlserver
     deploy:
       restart_policy:
