@@ -6,3 +6,27 @@ datasources:
   isDefault: true
   access: proxy
   editable: true
+- name: elasticsearch
+  type: elasticsearch
+  access: proxy
+  url: http://elasticsearch:9200
+  uid: "28kyjMzIk"
+  jsonData:
+    esVersion: '7.7.0'
+    timeField: 'discoverydate'
+- name: elasticsearch-unmapped
+  type: elasticsearch
+  access: proxy
+  url: http://elasticsearch:9200
+  uid: "28kyjMzJk"
+  jsonData:
+    esVersion: '7.7.0'
+    timeField: 'cluedincreated'
+- name: mssql
+  type: mssql
+  url: host.docker.internal
+  database: DataStore.Db.OpenCommunication
+  user: sa
+  uid: JmNKFSkSz
+  secureJsonData:
+    password: yourStrong(!)Password

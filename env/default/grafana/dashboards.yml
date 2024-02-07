@@ -6,3 +6,9 @@ providers:
   type: 'file'
   options:
     folder: '/var/lib/grafana/dashboards'
+- name: 'cluedin-strong-typed'
+  org_id: 1
+  folder: 'Profiling'
+  type: 'file'
+  options:
+    folder: '/var/lib/grafana/dashboards/profiling'
