@@ -7,17 +7,14 @@ has_children: True
 # Release Notes - v4.0.0
 
 ### Features
-- Updated hubspot provider with bearer authentication  (#17806)
-- Supports new microservices  (#26811)
-- Addition of charts and config to grafana for profiling of vocabulary keys.  (#25764)
-- Copilot signalR endpoint environment variable  (#24841)
-- Enable development feature flags  (#29143)
-- Profiling for vocabulary keys  (#29268)
-
-### Others
-- Update installed package versions  (#22608)
-- Updated RabbitMQ to 3.12  (#25063)
-- Add an env variable to control the limit size for the JSON parser so it can process larger payload if required. The default is set to 10MB  (#28076)
-- Important change: Switch to use usage of `cluedin/neo4j-home` image for Neo4j  (#28421)
-- Switch to `sqlserver-home` image to run SQL Server  (#27728)
+- Updated package versions for .Net 6 upgrade
+- Updated RabbitMQ to version 3.12
+- Important! Switched to use `cluedin/neo4j-home` image for Neo4j
+- Important! Switched to use `sqlserver-home` image to run SQL Server
+- Environment variable to control the limit size for the JSON parser so it can process larger payload if required (default 10MB)
+- Hubspot provider updated to pass bearer authentication in header of requests
+- New grafana charts, dashboards and config for profiling of vocabulary keys
+- Enabled development feature flags
+- Support for new microservices and deprecation of annotation, datasource and submitter
+- Support for Copilot signalR endpoint
 
