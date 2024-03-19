@@ -19,7 +19,7 @@
     ]
   },
   "description": "A new RabbitMQ Management Overview",
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "gnetId": 10991,
   "graphTooltip": 1,
@@ -686,6 +686,7 @@
     "to": "now"
   },
   "timepicker": {
+    "hidden": true,
     "refresh_intervals": [
       "1s",
       "15s",
