@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   server: &server
     user: root
@@ -50,6 +49,7 @@ services:
       - CLUEDIN_CONNECTIONSTRINGS__CLEANCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.CleanCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_CONNECTIONSTRINGS__INVITATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_CONNECTIONSTRINGS__STREAMLOG=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.StreamLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_CONNECTIONSTRINGS__STREAMCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.StreamCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
       - CLUEDIN_APPSETTINGS__AGENT_ENABLED=${CLUEDIN_AGENT_ENABLED}
       - CLUEDIN_APPSETTINGS__MODELS_ENABLED=${CLUEDIN_MODELS_ENABLED:-false}
       - DOTNET_ENVIRONMENT=${CLUEDIN_ENVIRONMENT}
@@ -77,16 +77,27 @@ services:
       - "${CLUEDIN_SERVER_PUBLIC_LOCALPORT:-9007}:9007"
       - "${CLUEDIN_SERVER_PROMETHEUS_METRICS_LOCALPORT:-9013}:9013"
     depends_on:
-      - neo4j
-      - elasticsearch
-      - rabbitmq
-      - redis
-      - seq
-      - sqlserver
+      neo4j:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      seq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
     deploy:
       restart_policy:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
+    healthcheck:
+      test: wget -O - http://localhost:9000/health/readiness || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   server-extra:
     <<: *server

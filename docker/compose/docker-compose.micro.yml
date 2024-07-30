@@ -1,37 +1,4 @@
-version: '3.7'
 services:
-  clean:
-    user: root
-    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-micro-clean:${CLUEDIN_CLEAN_TAG}
-    environment:
-    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
-    - RabbitMQ_CS=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
-    - ElasticURL=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
-    - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
-    - SeqLoggingLevel=debug
-    - LegacyURL=http://${CLUEDIN_SERVER_HOST:-server}:9000
-    - DbHost=${CLUEDIN_SQLSERVER_HOST}
-    - DbPassword=${CLUEDIN_SQLSERVER_PASS}
-    - DbUserName=${CLUEDIN_SQLSERVER_USER}
-    - DbName=${CLUEDIN_CLEAN_DBNAME:-DataStore.Db.MicroServices}
-    - ForceTableCreation=${CLUEDIN_CLEAN_FORCETABLECREATION:-false}
-    - AnnotationURL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-9011}
-    - DataSourceURL=http://${CLUEDIN_DATASOURCE_HOST:-datasource}:${CLUEDIN_DATASOURCE_PORT:-9011}
-    - NODE_ENV=${CLUEDIN_ENVIRONMENT}
-    - MAX_JSON_PAYLOAD_REST=${CLUEDIN_DATASOURCE_MAX_JSON_PAYLOAD_REST:-100000kb}
-    ports:
-      - "${CLUEDIN_CLEAN_LOCALPORT:-9009}:8888"
-    depends_on:
-    - elasticsearch
-    - rabbitmq
-    - sqlserver
-    - seq
-    - datasource
-    deploy:
-      restart_policy:
-        condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
-        delay: 5s
-
   datasource:
     user: root
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/data-source:${CLUEDIN_DATASOURCE_TAG}
@@ -52,17 +19,26 @@ services:
     ports:
       - "${CLUEDIN_DATASOURCE_LOCALPORT:-9011}:9011"
     depends_on:
-    - rabbitmq
-    - sqlserver
-    - seq
-    - elasticsearch
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      seq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     deploy:
       restart_policy:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
     volumes:
       - datasource:/shared
-
+    healthcheck:
+        test: wget --spider http://datasource:9011/status || exit 1
+        interval: 10s
+        timeout: 5s
+        retries: 5
+            
   datasource-processing:
     user: root
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/data-source-processing:${CLUEDIN_DATASOURCEPROCESSING_TAG}
@@ -83,19 +59,29 @@ services:
     - DataSourceProcessingNumOfMappingWorkers=1
     - DataSourceProcessingNumOfFileRecoveryWorkers=1
     - TMP_FILES_PATH=/shared
+    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
     ports:
       - "${CLUEDIN_DATASOURCEPROCESSING_LOCALPORT:-5757}:8888"
     depends_on:
-    - elasticsearch
-    - rabbitmq
-    - sqlserver
-    - seq
+      elasticsearch:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      seq:
+        condition: service_healthy
     deploy:
       restart_policy:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
     volumes:
       - datasource:/shared
+    healthcheck:
+        test: wget -O - http://datasource-processing:5757/status | grep 'true' || exit 1
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
   datasource-submitter:
     user: root
@@ -118,14 +104,23 @@ services:
     ports:
       - "${CLUEDIN_DATASOURCESUBMITTER_LOCALPORT:-9012}:8888"
     depends_on:
-    - elasticsearch
-    - rabbitmq
-    - sqlserver
-    - seq
+      elasticsearch:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      seq:
+        condition: service_healthy
     deploy:
       restart_policy:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
-
+    healthcheck:
+        test: wget -O - http://datasource-submitter:9012/status | grep 'true' || exit 1
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        
 volumes:
   datasource:

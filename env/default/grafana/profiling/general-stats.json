@@ -248,7 +248,7 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 3,
+        "w": 4,
         "x": 6,
         "y": 1
       },
@@ -313,8 +313,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 3,
-        "x": 9,
+        "w": 4,
+        "x": 10,
         "y": 1
       },
       "id": 47,
@@ -378,8 +378,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 3,
-        "x": 12,
+        "w": 4,
+        "x": 14,
         "y": 1
       },
       "id": 49,
@@ -406,110 +406,11 @@
             "uid": "JmNKFSkSz"
           },
           "format": "table",
-          "rawSql": "SELECT COUNT(GroupId)\r\n  FROM [DataStore.Db.OpenCommunication].[dbo].[DeduplicationGroupEntry]\r\n  GROUP BY GroupId",
+          "rawSql": "SELECT COUNT(*) FROM [DataStore.Db.OpenCommunication].[dbo].[DeduplicationGroupEntry] as DGE LEFT JOIN [DataStore.Db.OpenCommunication].[dbo].[DeduplicationProject] as DP ON DGE.[ProjectId] = DP.[Id] WHERE DP.[OrganizationId] = '${organizationId}'",
           "refId": "A"
         }
       ],
-      "title": "Possible Duplicate Count",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "elasticsearch",
-        "uid": "28kyjMzIk"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#476ca2",
-                "value": null
-              },
-              {
-                "color": "#64cfba",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "bool"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 15,
-        "y": 1
-      },
-      "id": 30,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "alias": "",
-          "bucketAggs": [
-            {
-              "field": "isExternalData",
-              "id": "3",
-              "settings": {
-                "min_doc_count": "1",
-                "order": "desc",
-                "orderBy": "_term",
-                "size": "0"
-              },
-              "type": "terms"
-            }
-          ],
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "28kyjMzIk"
-          },
-          "metrics": [
-            {
-              "id": "1",
-              "type": "count"
-            }
-          ],
-          "query": "* AND organizationId:${organizationId}",
-          "refId": "A",
-          "timeField": "discoverydate"
-        }
-      ],
-      "title": "Total External Data",
-      "transformations": [
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "dateFormat": "YYYY-DD-MM",
-                "destinationType": "time",
-                "targetField": "typedproperties.employee.startDate_Date"
-              }
-            ],
-            "fields": {}
-          }
-        }
-      ],
+      "title": "Deduplication Project(s) - Duplicate Count",
       "type": "stat"
     },
     {
@@ -2107,14 +2008,14 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
-    "hidden": true
+    "hidden": false
   },
   "timezone": "",
-  "title": "General Dashboard CluedIn",
+  "title": "Governance Dashboard",
   "uid": "TWiqNSkSk",
   "version": 12,
   "weekStart": ""

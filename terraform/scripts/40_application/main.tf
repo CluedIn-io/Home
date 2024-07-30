@@ -127,11 +127,6 @@ variable "cluedin_gql_image_version" {
   type = string
 }
 
-variable "cluedin_prepare_image_version" {
-  default = ""
-  type = string
-}
-
 variable "cluedin_submitter_image_version" {
   default = ""
   type = string
@@ -443,16 +438,6 @@ resource "helm_release" "cluedin-application" {
   }
 
   # PREPARE SETTINGS
-
-  set {
-    name = "clean.image.tag"
-    value = var.cluedin_prepare_image_version != "" ? var.cluedin_prepare_image_version : var.cluedin_image_version
-  }
-
-  set {
-    name = "clean.image.pullPolicy"
-    value = var.cluedin_image_pull_policy
-  }
 
   # ANNOTATION SETTINGS
 

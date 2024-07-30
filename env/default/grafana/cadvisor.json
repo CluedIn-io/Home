@@ -247,11 +247,6 @@
           },
           {
             "selected": false,
-            "text": "clean",
-            "value": "clean"
-          },
-          {
-            "selected": false,
             "text": "datasource",
             "value": "datasource"
           },

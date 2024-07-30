@@ -101,12 +101,12 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Total Values for '${key}'",
+      "title": "Total Values for '${friendlyName}'",
       "type": "stat"
     },
     {
@@ -160,7 +160,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "5",
               "settings": {
                 "min_doc_count": "1",
@@ -181,12 +181,12 @@
               "type": "count"
             }
           ],
-          "query": "organizationId:${organizationId} AND typedproperties.${key}_${dataType}=true",
+          "query": "organizationId:${organizationId} AND ${key}=true",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "'${key}' is True",
+      "title": "'${friendlyName}' is True",
       "type": "stat"
     },
     {
@@ -248,7 +248,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "5",
               "settings": {
                 "min_doc_count": "1",
@@ -269,12 +269,12 @@
               "type": "count"
             }
           ],
-          "query": "organizationId:${organizationId} AND typedproperties.${key}_${dataType}=false",
+          "query": "organizationId:${organizationId} AND ${key}=false",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "'${key}' is False",
+      "title": "'${friendlyName}' is False",
       "type": "stat"
     },
     {
@@ -395,12 +395,12 @@
               "type": "count"
             }
           ],
-          "query": "typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Values Over Time for '${key}'",
+      "title": "Values Over Time for '${friendlyName}'",
       "type": "timeseries"
     }
   ],
@@ -456,14 +456,14 @@
       {
         "current": {
           "selected": false,
-          "text": "Boolean",
-          "value": "Boolean"
+          "text": "user.firstName",
+          "value": "user.firstName"
         },
         "hide": 0,
         "includeAll": false,
-        "label": "Data Type",
+        "label": "Friendly Name",
         "multi": false,
-        "name": "dataType",
+        "name": "friendlyName",
         "options": [
           {
             "selected": true,
@@ -482,7 +482,7 @@
     "to": "now"
   },
   "timepicker": {
-    "hidden": true,
+    "hidden": false,
     "refresh_intervals": [
       "5s",
       "10s",
@@ -497,7 +497,7 @@
     ]
   },
   "timezone": "",
-  "title": "Boolean Vocabulary Key",
+  "title": "Metrics (True/False)",
   "uid": "3lAj47zSz",
   "version": 2,
   "weekStart": ""

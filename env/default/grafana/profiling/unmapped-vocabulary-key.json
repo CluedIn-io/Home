@@ -450,11 +450,11 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
-    "hidden": true,
+    "hidden": false,
     "refresh_intervals": [
       "5s",
       "10s",
@@ -469,7 +469,7 @@
     ]
   },
   "timezone": "",
-  "title": "Unmapped Vocabulary Key",
+  "title": "Metrics (Unmapped)",
   "uid": "xKKNHSAIk",
   "version": 2,
   "weekStart": ""

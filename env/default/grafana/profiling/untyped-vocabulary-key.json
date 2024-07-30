@@ -472,11 +472,11 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
-    "hidden": true,
+    "hidden": false,
     "refresh_intervals": [
       "5s",
       "10s",
@@ -491,7 +491,7 @@
     ]
   },
   "timezone": "",
-  "title": "Untyped Vocabulary Key",
+  "title": "Metrics",
   "uid": "xKKNWOTIk",
   "version": 2,
   "weekStart": ""

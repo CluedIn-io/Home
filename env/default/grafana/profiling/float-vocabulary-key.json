@@ -97,7 +97,7 @@
           },
           "metrics": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "1",
               "type": "min"
             }
@@ -181,7 +181,7 @@
           },
           "metrics": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "1",
               "meta": {
                 "std_deviation": true,
@@ -270,7 +270,7 @@
           },
           "metrics": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "1",
               "type": "max"
             }
@@ -354,7 +354,7 @@
           },
           "metrics": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "1",
               "type": "avg"
             }
@@ -442,7 +442,7 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
@@ -521,7 +521,7 @@
           },
           "metrics": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "1",
               "type": "sum"
             }
@@ -650,12 +650,12 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Values Over Time for '${key}'",
+      "title": "Values Over Time for '${friendlyName}'",
       "type": "timeseries"
     }
   ],
@@ -722,9 +722,9 @@
         },
         "hide": 0,
         "includeAll": false,
-        "label": "Data Type",
+        "label": "Friendly Name",
         "multi": false,
-        "name": "dataType",
+        "name": "friendlyName",
         "options": [
           {
             "selected": true,
@@ -739,11 +739,11 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
-    "hidden": true,
+    "hidden": false,
     "refresh_intervals": [
       "5s",
       "10s",
@@ -758,7 +758,7 @@
     ]
   },
   "timezone": "",
-  "title": "Float Vocabulary Key",
+  "title": "Metrics (Number)",
   "uid": "LFRqeMkIk",
   "version": 4,
   "weekStart": ""

@@ -102,12 +102,12 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Total Values for '${key}'",
+      "title": "Total Values for '${friendlyName}'",
       "type": "stat"
     },
     {
@@ -228,12 +228,12 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Values Over Time for '${key}'",
+      "title": "Values Over Time for '${friendlyName}'",
       "type": "timeseries"
     },
     {
@@ -286,7 +286,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "3",
               "settings": {
                 "min_doc_count": "1",
@@ -307,12 +307,12 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Distribution of Values for '${key}'",
+      "title": "Distribution of Values for '${friendlyName}'",
       "transformations": [
         {
           "id": "convertFieldType",
@@ -388,7 +388,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "3",
               "settings": {
                 "min_doc_count": "1",
@@ -409,12 +409,12 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Distribution of Values for '${key}'",
+      "title": "Distribution of Values for '${friendlyName}'",
       "transformations": [],
       "type": "piechart"
     }
@@ -477,9 +477,9 @@
         },
         "hide": 0,
         "includeAll": false,
-        "label": "Data Type",
+        "label": "Friendly Name",
         "multi": false,
-        "name": "dataType",
+        "name": "friendlyName",
         "options": [
           {
             "selected": false,
@@ -494,11 +494,11 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
-    "hidden": true,
+    "hidden": false,
     "refresh_intervals": [
       "5s",
       "10s",
@@ -513,7 +513,7 @@
     ]
   },
   "timezone": "",
-  "title": "Text Vocabulary Key",
+  "title": "Metrics (Text)",
   "uid": "xKKNHSzIk",
   "version": 2,
   "weekStart": ""

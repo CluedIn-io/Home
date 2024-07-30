@@ -81,7 +81,6 @@ function Test-Environment {
         [PortCheck]::new('CluedIn Jobs', $envDetails.CLUEDIN_SERVER_JOB_LOCALPORT ?? 9003, $cluedinDomain)
         [PortCheck]::new('CluedIn WebHooks', $envDetails.CLUEDIN_SERVER_WEBHOOK_LOCALPORT ?? 9006, $cluedinDomain)
         [PortCheck]::new('CluedIn Public', $envDetails.CLUEDIN_SERVER_PUBLIC_LOCALPORT ?? 9007, $cluedinDomain)
-        [PortCheck]::new('CluedIn Clean', $envDetails.CLUEDIN_CLEAN_LOCALPORT ?? 9009, $cluedinDomain)
         [PortCheck]::new('CluedIn Annotation', $envDetails.CLUEDIN_ANNOTATION_LOCALPORT ?? 9010, $cluedinDomain)
         [PortCheck]::new('CluedIn Datasource', $envDetails.CLUEDIN_DATASOURCE_LOCALPORT ?? 9011, $cluedinDomain)
         [PortCheck]::new('CluedIn Submitter', $envDetails.CLUEDIN_SUBMITTER_LOCALPORT ?? 9012, $cluedinDomain)

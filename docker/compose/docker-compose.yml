@@ -1,4 +1,3 @@
-version: '3.7'
 services:
     smtp4dev:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/rnwood/smtp4dev:latest
@@ -14,6 +13,11 @@ services:
         ports:
             - "${CLUEDIN_NEO4J_HTTP_LOCALPORT:-7474}:7474"
             - "${CLUEDIN_NEO4J_BOLT_LOCALPORT:-7687}:7687"
+        healthcheck:
+            test: wget http://localhost:7474/ || exit 1
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     elasticsearch:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.8.0
@@ -22,6 +26,11 @@ services:
         ports:
             - "${CLUEDIN_ELASTIC_HTTP_LOCALPORT:-9200}:9200"
             - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
+        healthcheck:
+            test: curl localhost:9200/_cat/health | grep -oP 'green|yellow' || exit 1
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     rabbitmq:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/rabbitmq:3.12.2-debian-11-r25
@@ -35,11 +44,19 @@ services:
         hostname: cluedin-dev
         volumes:
             - type: bind
-              source: ./prometheus/rabbitmq.conf
+              source: ./rabbitmq/rabbitmq.conf
               target: /etc/rabbitmq/conf.d/rabbitmq.conf
             - type: bind
-              source: ./prometheus/plugins.conf
+              source: ./rabbitmq/plugins.conf
               target: /etc/rabbitmq/enabled_plugins
+            - type: bind
+              source: ./rabbitmq/cluedin_plugin.ez
+              target: /opt/bitnami/rabbitmq/plugins/cluedin_plugin.ez
+        healthcheck:
+            test: rabbitmq-diagnostics is_running | grep 'fully booted and running' || exit 1
+            interval: 10s
+            timeout: 5s
+            retries: 5
     redis:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/redis:6.2.7-debian-11-r11
         environment:
@@ -53,6 +70,12 @@ services:
         ports:
             - "${CLUEDIN_SEQ_UI_LOCALPORT:-3200}:80"
             - "${CLUEDIN_SEQ_DATA_LOCALPORT:-5341}:5341"
+        healthcheck:
+            test: curl http://localhost/health | grep 'The Seq node is in service' || exit 1
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
     openrefine:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/openrefine:${CLUEDIN_OPENREFINE_TAG}
         ports:
@@ -138,7 +161,8 @@ services:
             - /sys:/sys:ro
             - /var/lib/docker/:/var/lib/docker:ro
         depends_on:
-            - sqlserver
+            sqlserver:
+              condition: service_healthy
         deploy:
             restart_policy:
                 condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}

@@ -82,7 +82,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "2",
               "settings": {
                 "min_doc_count": "1",
@@ -167,7 +167,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "typedproperties.${key}_${dataType}",
+              "field": "${key}",
               "id": "2",
               "settings": {
                 "min_doc_count": "1",
@@ -272,7 +272,7 @@
               "type": "count"
             }
           ],
-          "query": "+typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "+${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
@@ -355,7 +355,7 @@
               "type": "count"
             }
           ],
-          "query": "-typedproperties.${key}_${dataType}:* AND organizationId:${organizationId}",
+          "query": "-${key}:* AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
@@ -479,12 +479,12 @@
               "type": "count"
             }
           ],
-          "query": "-t﻿ypedproperties.${key}_${dataType}:Cat AND organizationId:${organizationId}",
+          "query": "-${key}:Cat AND organizationId:${organizationId}",
           "refId": "A",
           "timeField": "discoverydate"
         }
       ],
-      "title": "Values Over Time for '${key}'",
+      "title": "Values Over Time for '${friendlyName}'",
       "type": "timeseries"
     }
   ],
@@ -545,9 +545,9 @@
         },
         "hide": 0,
         "includeAll": false,
-        "label": "Data Type",
+        "label": "Friendly Name",
         "multi": false,
-        "name": "dataType",
+        "name": "friendlyName",
         "options": [
           {
             "selected": true,
@@ -562,11 +562,11 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
-    "hidden": true,
+    "hidden": false,
     "refresh_intervals": [
       "1s",
       "5s",
@@ -582,7 +582,7 @@
     ]
   },
   "timezone": "",
-  "title": "DateTime Vocabulary Key",
+  "title": "Metrics (Date/Time)",
   "uid": "b9Q0i7kSz",
   "version": 4,
   "weekStart": ""

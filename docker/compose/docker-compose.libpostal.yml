@@ -1,4 +1,3 @@
-version: '3.7'
 services:
     libpostal:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/libpostal:${CLUEDIN_LIBPOSTAL_TAG}
