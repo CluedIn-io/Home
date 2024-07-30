@@ -16,7 +16,6 @@ be exposed on `localhost` through the _local_ port.
 |               | 9003       | 9003          | Jobs API                |
 |               | 9006       | 9006          | Webhooks                |
 |               | 9007       | 9007          | Public API              |
-| clean         | 9009       | 8888          | Clean API               |
 | annotation    | 9010       | 8888          | Annotation API          |
 | datasource    | 9011       | 8888          | DataSource API          |
 | documentation | 9021       | 8888          | Documentation API       |
