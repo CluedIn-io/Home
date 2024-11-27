@@ -88,6 +88,8 @@ function DockerCompose {
     } finally {
         Pop-Location
     }
+    
+    $gatewayEnabled = GetEnvironmentValue $Env CLUEDIN_ENABLE_API_GATEWAY
 
     if($action -eq 'up' -or $action -eq 'start'){
         # If action is up/start - we need to ensure prometheus ports are updated
@@ -102,6 +104,38 @@ function DockerCompose {
             "    - host.docker.internal:$(GetEnvironmentValue $Env CLUEDIN_DATASOURCE_PROMETHEUS_SQL_METRICS_LOCALPORT 9015)"
         )
         Set-Content $prometheusPath -Value $prometheusContent
+
+        # If SSL is disabled, do not create the haproxy container
+        $proxyEnabled = (GetEnvironmentValue $Env CLUEDIN_UI_LOCALPORT_HTTPS) -ne ''
+        if($proxyEnabled){
+            $pemFileExists = [System.IO.File]::Exists((Join-Path $pwd env default haproxy localhost.pem))
+            if (-Not $pemFileExists){
+                throw "localhost.pem file does not exist in haproxy folder"
+            }
+        }
+        else {
+            $Disable += "proxy"
+        }
+        
+        $env:CLUEDIN_PROXY_PUBLICURL=''	# env variable need to exist to avoid docker-compoose warning
+        if ($gatewayEnabled -match '^(true|1)$') {
+            if (!$proxyEnabled) {
+                throw "The api gateway requires the proxy to be enabled. Please set CLUEDIN_UI_LOCALPORT_HTTPS to enable the proxy"
+            }
+            
+            if ($env:NGROK_AUTHTOKEN -eq $null) {
+                throw "NGROK_AUTHTOKEN environment variable is not set. This token is required for ngrok to authenticate with their servers. Please obtain your auth token from the ngrok dashboard (https://dashboard.ngrok.com/get-started/your-authtoken) and set the NGROK_AUTHTOKEN environment variable before running the script again."
+            }
+
+            if ($env:NGROK_DOMAIN -eq $null) {
+                throw "NGROK_DOMAIN environment variable is not set. This variable is required to create a stable tunnel endpoint for your API. Please generate your static domain using the ngrok dashboard (https://dashboard.ngrok.com/cloud-edge/domains) and set the NGROK_DOMAIN environment variable before running the script again."
+            }
+	    
+            $env:CLUEDIN_PROXY_PUBLICURL="https://$env:NGROK_DOMAIN"
+        }
+        else {
+            $Disable += "gateway"
+        }
     }
 
     $compose = "docker-compose $projectName $composeFiles --project-directory '$envPath' --env-file '$(Join-Path $envPath .env)' $action"

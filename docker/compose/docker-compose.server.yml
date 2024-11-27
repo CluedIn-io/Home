@@ -3,8 +3,10 @@ services:
     user: root
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-server:${CLUEDIN_SERVER_TAG}
     environment:
+      - CLUEDIN_APPSETTINGS__PROXY_ENABLED=${CLUEDIN_UI_LOCALPORT_HTTPS:+true}
+      - CLUEDIN_APPSETTINGS__PROXY_PUBLICURL=${CLUEDIN_PROXY_PUBLICURL}
       - CLUEDIN_APPSETTINGS__AGENTSERVERURL=http://${CLUEDIN_DOMAIN}:9000
-      - CLUEDIN_APPSETTINGS__AUTHRETURNURL=http://${CLUEDIN_DOMAIN}:9001
+      - CLUEDIN_APPSETTINGS__AUTHRETURNURL=http${CLUEDIN_UI_LOCALPORT_HTTPS:+s}://${CLUEDIN_DOMAIN}:${CLUEDIN_UI_LOCALPORT_HTTPS-9001}${CLUEDIN_UI_LOCALPORT_HTTPS:+/auth}
       - CLUEDIN_APPSETTINGS__AUTHSERVERURL=http://${CLUEDIN_DOMAIN}:9001
       - CLUEDIN_APPSETTINGS__DOMAIN=${CLUEDIN_DOMAIN}
       - CLUEDIN_APPSETTINGS__JOBSERVERDASHBOARDURL=http://*:9003
@@ -97,7 +99,7 @@ services:
       test: wget -O - http://localhost:9000/health/readiness || exit 1
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
 
   server-extra:
     <<: *server
