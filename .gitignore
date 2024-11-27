@@ -1,0 +1,5 @@
+**/env/**/components
+**/env/**/emails
+**/env/**/packages
+**/env/**/data
+**/env/**/docker-compose.override.yml

@@ -1,0 +1,14 @@
+services:
+  proxy:
+    image: haproxy:2.9.4
+    ports:
+      - $CLUEDIN_UI_LOCALPORT_HTTPS:443
+      - 9999:9999
+    volumes:
+      - "../../env/default/haproxy:/usr/local/etc/haproxy:ro"
+    environment:
+      - CLUEDIN_UI_LOCALPORT_HTTPS=${CLUEDIN_UI_LOCALPORT_HTTPS}
+      - CLUEDIN_SERVER_HOST=${CLUEDIN_SERVER_HOST:-server}
+      - CLUEDIN_OPENREFINE_HOST=${CLUEDIN_OPENREFINE_HOST:-openrefine}
+      - CLUEDIN_GQL_HOST=${CLUEDIN_GQL_HOST:-gql}
+      - CLUEDIN_SEQ_HOST=${CLUEDIN_SEQ_HOST:-seq}
