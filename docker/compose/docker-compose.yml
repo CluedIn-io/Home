@@ -17,12 +17,13 @@ services:
             test: wget http://localhost:7474/ || exit 1
             interval: 10s
             timeout: 5s
-            retries: 5
+            retries: 12
 
     elasticsearch:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.8.0
         environment:
             - discovery.type=single-node
+            - search.max_open_scroll_context=1000
         ports:
             - "${CLUEDIN_ELASTIC_HTTP_LOCALPORT:-9200}:9200"
             - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
@@ -30,7 +31,7 @@ services:
             test: curl localhost:9200/_cat/health | grep -oP 'green|yellow' || exit 1
             interval: 10s
             timeout: 5s
-            retries: 5
+            retries: 12
 
     rabbitmq:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/rabbitmq:3.12.2-debian-11-r25
@@ -56,7 +57,7 @@ services:
             test: rabbitmq-diagnostics is_running | grep 'fully booted and running' || exit 1
             interval: 10s
             timeout: 5s
-            retries: 5
+            retries: 12
     redis:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/redis:6.2.7-debian-11-r11
         environment:
@@ -74,7 +75,7 @@ services:
             test: curl http://localhost/health | grep 'The Seq node is in service' || exit 1
             interval: 10s
             timeout: 5s
-            retries: 5
+            retries: 12
 
     openrefine:
         image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/openrefine:${CLUEDIN_OPENREFINE_TAG}

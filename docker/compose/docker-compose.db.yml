@@ -14,4 +14,4 @@ services:
           test: /opt/mssql-tools/bin/sqlcmd -d 'DataStore.Db.WebApp' -U sa -P '${CLUEDIN_SQLSERVER_PASS}' -Q 'SELECT 1 FROM Invitations' || exit 1
           interval: 10s
           timeout: 5s
-          retries: 5
+          retries: 12

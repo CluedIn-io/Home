@@ -118,7 +118,7 @@ function Invoke-Environment {
                 }
             }
             'get' {
-                InvokeEnvironment @innerArgs
+                InvokeEnvironment @innerArgs -Get
             }
             'unset' {
                 InvokeEnvironment @innerArgs -Unset $Unset

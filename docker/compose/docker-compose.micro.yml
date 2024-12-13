@@ -16,6 +16,7 @@ services:
     - DataSourceHost=${CLUEDIN_DATASOURCE_HOST:-datasource}
     - DataSourcePort=${CLUEDIN_DATASOURCE_PORT:-9011}
     - TMP_FILES_PATH=/shared
+    - AUTH_API=http://${CLUEDIN_SERVER_HOST:-server}:9001
     ports:
       - "${CLUEDIN_DATASOURCE_LOCALPORT:-9011}:9011"
     depends_on:
@@ -37,7 +38,7 @@ services:
         test: wget --spider http://datasource:9011/status || exit 1
         interval: 10s
         timeout: 5s
-        retries: 5
+        retries: 12
             
   datasource-processing:
     user: root
@@ -60,8 +61,9 @@ services:
     - DataSourceProcessingNumOfFileRecoveryWorkers=1
     - TMP_FILES_PATH=/shared
     - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
+    - AUTH_API=http://${CLUEDIN_SERVER_HOST:-server}:9001
     ports:
-      - "${CLUEDIN_DATASOURCEPROCESSING_LOCALPORT:-5757}:8888"
+      - "${CLUEDIN_DATASOURCEPROCESSING_LOCALPORT:-5757}:5757"
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -81,7 +83,7 @@ services:
         test: wget -O - http://datasource-processing:5757/status | grep 'true' || exit 1
         interval: 10s
         timeout: 5s
-        retries: 5
+        retries: 12
 
   datasource-submitter:
     user: root
@@ -120,7 +122,7 @@ services:
         test: wget -O - http://datasource-submitter:9012/status | grep 'true' || exit 1
         interval: 10s
         timeout: 5s
-        retries: 5
+        retries: 12
         
 volumes:
   datasource:

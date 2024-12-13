@@ -1,0 +1,15 @@
+services:
+  gateway:
+    image: ngrok/ngrok:3.12.1-alpine
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command:
+      - "http"
+      - "--domain"
+      - ${NGROK_DOMAIN}
+      - "proxy:443"
+    healthcheck:
+      test: wget -O - http://127.0.0.1:4040/api/tunnels | grep 'public_url' || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 12
