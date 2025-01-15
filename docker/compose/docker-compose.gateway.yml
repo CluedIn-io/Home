@@ -1,6 +1,6 @@
 services:
   gateway:
-    image: ngrok/ngrok:3.12.1-alpine
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/ngrok/ngrok:3.12.1-alpine
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     command:

@@ -1,6 +1,6 @@
 services:
   proxy:
-    image: haproxy:2.9.4
+    image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/haproxy:2.9.4
     ports:
       - $CLUEDIN_UI_LOCALPORT_HTTPS:443
       - 9999:9999
