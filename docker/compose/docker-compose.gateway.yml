@@ -2,11 +2,11 @@ services:
   gateway:
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/ngrok/ngrok:3.12.1-alpine
     environment:
-      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN:-}
     command:
       - "http"
       - "--domain"
-      - ${NGROK_DOMAIN}
+      - ${NGROK_DOMAIN:-}
       - "proxy:443"
     healthcheck:
       test: wget -O - http://127.0.0.1:4040/api/tunnels | grep 'public_url' || exit 1

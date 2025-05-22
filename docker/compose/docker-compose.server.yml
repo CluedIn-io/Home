@@ -4,7 +4,7 @@ services:
     image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/cluedin-server:${CLUEDIN_SERVER_TAG}
     environment:
       - CLUEDIN_APPSETTINGS__PROXY_ENABLED=${CLUEDIN_UI_LOCALPORT_HTTPS:+true}
-      - CLUEDIN_APPSETTINGS__PROXY_PUBLICURL=${CLUEDIN_PROXY_PUBLICURL}
+      - CLUEDIN_APPSETTINGS__PROXY_PUBLICURL=${CLUEDIN_PROXY_PUBLICURL:-}
       - CLUEDIN_APPSETTINGS__AGENTSERVERURL=http://${CLUEDIN_DOMAIN}:9000
       - CLUEDIN_APPSETTINGS__AUTHRETURNURL=http${CLUEDIN_UI_LOCALPORT_HTTPS:+s}://${CLUEDIN_DOMAIN}:${CLUEDIN_UI_LOCALPORT_HTTPS-9001}${CLUEDIN_UI_LOCALPORT_HTTPS:+/auth}
       - CLUEDIN_APPSETTINGS__AUTHSERVERURL=http://${CLUEDIN_DOMAIN}:9001
@@ -35,23 +35,23 @@ services:
       - CLUEDIN_CONNECTIONSTRINGS__SEARCHSTORE=http://${CLUEDIN_ELASTIC_HOST:-elasticsearch}:9200
       - CLUEDIN_CONNECTIONSTRINGS__SIGNALRSCALEOUT=amqp://${CLUEDIN_RABBITMQ_USERNAME:-cluedin}:${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}@${CLUEDIN_RABBITMQ_HOST:-rabbitmq}:5672
 
-      - CLUEDIN_CONNECTIONSTRINGS__AUTHENTICATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__AUDITLOG=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.AuditLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__BLOBSTORAGE=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.BlobStorage;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__CONFIGURATIONSTORE=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.Configuration;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__CLUEDINENTITIES=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__TOKENSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.TokenStore;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__TRAINING=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Training;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__EXTERNALSEARCH=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ExternalSearch;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__METRICS=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Metrics;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__LOCKING=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__ML_LOGGING=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__WEBAPPSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__MICROSERVICES=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.MicroServices;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__CLEANCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.CleanCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__INVITATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__STREAMLOG=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.StreamLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
-      - CLUEDIN_CONNECTIONSTRINGS__STREAMCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.StreamCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True
+      - CLUEDIN_CONNECTIONSTRINGS__AUTHENTICATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Authentication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};MultipleActiveResultSets=True;connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__AUDITLOG=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.AuditLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__BLOBSTORAGE=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.BlobStorage;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__CONFIGURATIONSTORE=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.Configuration;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__CLUEDINENTITIES=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__TOKENSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.TokenStore;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__TRAINING=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Training;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__EXTERNALSEARCH=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ExternalSearch;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__METRICS=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.Metrics;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__LOCKING=Data source=${CLUEDIN_SQLSERVER_HOST};Initial catalog=DataStore.Db.OpenCommunication;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__ML_LOGGING=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.ML-Logging;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__WEBAPPSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__MICROSERVICES=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.MicroServices;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__CLEANCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.CleanCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__INVITATIONSTORE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.WebApp;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__STREAMLOG=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.StreamLog;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
+      - CLUEDIN_CONNECTIONSTRINGS__STREAMCACHE=Data Source=${CLUEDIN_SQLSERVER_HOST};Initial Catalog=DataStore.Db.StreamCache;User Id=${CLUEDIN_SQLSERVER_USER};Password=${CLUEDIN_SQLSERVER_PASS};connection timeout=0;Max Pool Size=200;Pooling=True;Encrypt=false
       - CLUEDIN_APPSETTINGS__AGENT_ENABLED=${CLUEDIN_AGENT_ENABLED}
       - CLUEDIN_APPSETTINGS__MODELS_ENABLED=${CLUEDIN_MODELS_ENABLED:-false}
       - DOTNET_ENVIRONMENT=${CLUEDIN_ENVIRONMENT}
@@ -68,6 +68,8 @@ services:
       - CLUEDIN_APPSETTINGS__CLUEPROCESSING_FUZZYENTITYMATCHING_MATCHER_NAME=${CLUEDIN_FUZZYENTITYMATCHING_MATCHER_NAME_ENABLED:-false}
       - CLUEDIN_APPSETTINGS__CLUEPROCESSING_FUZZYENTITYMATCHING_MATCHER_LEGACY=${CLUEDIN_FUZZYENTITYMATCHING_MATCHER_LEGACY_ENABLED:-false}
       - CLUEDIN_APPSETTINGS__CLUEPROCESSING_FUZZYENTITYMATCHING_MATCHER_LEGACYFUZZYENTITYMATCHERV2=${CLUEDIN_FUZZYENTITYMATCHING_MATCHER_LEGACYFUZZYENTITYMATCHERV2_ENABLED:-false}
+      - CLUEDIN_APPSETTINGS__SELFHOSTEDAI_BASEURL=http://ai-host:11434
+      - CLUEDIN_APPSETTINGS__EXTERNALSEARCH_AIAGENT_URL=http://ai-host:11434
     volumes:
         - "./components:/components"
         - ".${CLUEDIN_EMAIL_DIR:-}:/app/${CLUEDIN_EMAIL_DIR:-emails}"

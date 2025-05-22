@@ -11,7 +11,7 @@ services:
             - MSSQL_MASTER_DATA_FILE=/mssql-data/master/master.mdf
             - MSSQL_MASTER_LOG_FILE=/mssql-data/master/mastlog.ldf
         healthcheck:
-          test: /opt/mssql-tools/bin/sqlcmd -d 'DataStore.Db.WebApp' -U sa -P '${CLUEDIN_SQLSERVER_PASS}' -Q 'SELECT 1 FROM Invitations' || exit 1
+          test: /opt/mssql-tools/bin/sqlcmd -d 'DataStore.Db.WebApp' -U sa -P '${CLUEDIN_SQLSERVER_PASS}' -C -Q 'SELECT 1 FROM Invitations' || exit 1
           interval: 10s
           timeout: 5s
           retries: 12

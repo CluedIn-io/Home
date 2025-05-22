@@ -93,7 +93,7 @@ services:
               target: /etc/prometheus/prometheus.yml
         command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
     grafana:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/grafana/grafana:8.4.7
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/grafana/grafana:10.3.3
         environment:
             - GF_AUTH_ANONYMOUS_ENABLED=true
             - GF_SECURITY_ALLOW_EMBEDDING=true

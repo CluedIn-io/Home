@@ -36,6 +36,11 @@ function DockerCompose {
     if($libPostalReplicas -lt 1){
         $exclude += '*libpostal*'
     }
+    
+    $disableDataMountEnv = GetEnvironmentValue $Env HOME_DISABLE_DATA_MOUNT 'false'
+    if ($disableDataMountEnv -eq 'true') {
+        $DisableData = $true
+    }
 
     # Exclude data if disabled
     if($DisableData) {

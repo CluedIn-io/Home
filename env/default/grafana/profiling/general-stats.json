@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -18,15 +21,18 @@
       }
     ]
   },
-  "editable": false,
+  "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1694680282375,
+  "id": 6,
   "links": [],
   "liveNow": false,
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -34,6 +40,15 @@
         "y": 0
       },
       "id": 41,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Stats",
       "type": "row"
     },
@@ -61,7 +76,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": []
       },
@@ -84,9 +100,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.7",
+      "pluginVersion": "10.3.3",
       "targets": [
         {
           "alias": "",
@@ -144,7 +162,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unitScale": true
         },
         "overrides": []
       },
@@ -167,9 +186,11 @@
           "fields": "/^Count$/",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.7",
+      "pluginVersion": "10.3.3",
       "targets": [
         {
           "alias": "",
@@ -221,199 +242,9 @@
     },
     {
       "datasource": {
-        "type": "mssql",
-        "uid": "JmNKFSkSz"
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#476ca2",
-                "value": null
-              },
-              {
-                "color": "#64cfba",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 6,
-        "y": 1
-      },
-      "id": 43,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "mssql",
-            "uid": "JmNKFSkSz"
-          },
-          "format": "table",
-          "rawSql": "SELECT SUM (d.Persistence)\r\n  FROM [DataStore.Db.Metrics].[dbo].Metric m\r\n  INNER JOIN [DataStore.Db.Metrics].[dbo].Dimension d on\r\n  m.Id = d.MetricId\r\n  WHERE m.Name = 'counter.billable-record'",
-          "refId": "A"
-        }
-      ],
-      "title": "Billable Record Count",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "mssql",
-        "uid": "JmNKFSkSz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#476ca2",
-                "value": null
-              },
-              {
-                "color": "#64cfba",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "locale"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 10,
-        "y": 1
-      },
-      "id": 47,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "mssql",
-            "uid": "JmNKFSkSz"
-          },
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) FROM [DataStore.Db.BlobStorage].[dbo].Blobs \r\nWhere MimeType = 'application/vnd.cluedin.entity.xml'",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Blobs",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "mssql",
-        "uid": "JmNKFSkSz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#476ca2",
-                "value": null
-              },
-              {
-                "color": "#64cfba",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "locale"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 14,
-        "y": 1
-      },
-      "id": 49,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "mssql",
-            "uid": "JmNKFSkSz"
-          },
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) FROM [DataStore.Db.OpenCommunication].[dbo].[DeduplicationGroupEntry] as DGE LEFT JOIN [DataStore.Db.OpenCommunication].[dbo].[DeduplicationProject] as DP ON DGE.[ProjectId] = DP.[Id] WHERE DP.[OrganizationId] = '${organizationId}'",
-          "refId": "A"
-        }
-      ],
-      "title": "Deduplication Project(s) - Duplicate Count",
-      "type": "stat"
-    },
-    {
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -421,7 +252,16 @@
         "y": 6
       },
       "id": 39,
-      "title": "Entity Types",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Business Domains",
       "type": "row"
     },
     {
@@ -441,7 +281,8 @@
               "viz": false
             }
           },
-          "mappings": []
+          "mappings": [],
+          "unitScale": true
         },
         "overrides": []
       },
@@ -459,6 +300,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "right",
+          "showLegend": true,
           "values": []
         },
         "pieType": "pie",
@@ -506,7 +348,7 @@
           "timeField": "discoverydate"
         }
       ],
-      "title": "Entity Type Distribution",
+      "title": "Business Domain Distribution",
       "transformations": [
         {
           "id": "convertFieldType",
@@ -547,7 +389,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unitScale": true
         },
         "overrides": []
       },
@@ -560,15 +403,21 @@
       "id": 15,
       "options": {
         "displayMode": "lcd",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
           "values": true
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
-      "pluginVersion": "8.4.7",
+      "pluginVersion": "10.3.3",
       "targets": [
         {
           "alias": "",
@@ -600,7 +449,7 @@
           "timeField": "discoverydate"
         }
       ],
-      "title": "Entity Type Heatmap",
+      "title": "Business Domain Heatmap",
       "transformations": [
         {
           "id": "convertFieldType",
@@ -619,6 +468,10 @@
       "type": "bargauge"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -626,6 +479,15 @@
         "y": 18
       },
       "id": 37,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Data Sources",
       "type": "row"
     },
@@ -640,6 +502,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
@@ -653,6 +518,9 @@
             "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -669,7 +537,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -699,11 +568,13 @@
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
+        "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "orientation": "auto",
         "showValue": "auto",
@@ -768,6 +639,10 @@
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -776,6 +651,15 @@
       },
       "id": 35,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Processing",
       "type": "row"
     },
@@ -790,6 +674,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -801,6 +688,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -831,7 +719,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -861,8 +750,9 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
@@ -915,6 +805,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -926,6 +819,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -956,7 +850,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -986,8 +881,9 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
@@ -1055,6 +951,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1066,6 +965,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1096,7 +996,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -1126,8 +1027,9 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
@@ -1195,6 +1097,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1206,6 +1111,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1236,7 +1142,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -1266,8 +1173,9 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
@@ -1325,112 +1233,11 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "mssql",
-        "uid": "JmNKFSkSz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "locale"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "value"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#64cfba",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 9,
-        "x": 9,
-        "y": 40
-      },
-      "id": 45,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "none",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "mssql",
-            "uid": "JmNKFSkSz"
-          },
-          "format": "time_series",
-          "rawSql": "SELECT\n  CreatedDate time,\n  COUNT(*) value\nFROM [DataStore.Db.OpenCommunication].[dbo].GDPRMessages\nWHERE $__timeFilter(CreatedDate)\nGROUP BY CreatedDate\nORDER BY CreatedDate",
-          "refId": "A"
-        }
-      ],
-      "title": "Mesh Commands Over Time",
-      "type": "timeseries"
-    },
-    {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1439,6 +1246,15 @@
       },
       "id": 33,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Properties",
       "type": "row"
     },
@@ -1453,6 +1269,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
@@ -1466,6 +1285,9 @@
             "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -1482,7 +1304,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -1512,11 +1335,13 @@
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
+        "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "orientation": "auto",
         "showValue": "auto",
@@ -1590,6 +1415,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
@@ -1603,6 +1431,9 @@
             "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -1619,7 +1450,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -1649,11 +1481,13 @@
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
+        "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "orientation": "auto",
         "showValue": "auto",
@@ -1727,6 +1561,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
@@ -1740,6 +1577,9 @@
             "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -1756,7 +1596,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -1786,11 +1627,13 @@
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
+        "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "orientation": "auto",
         "showValue": "auto",
@@ -1836,7 +1679,7 @@
           "timeField": "discoverydate"
         }
       ],
-      "title": "Number of Entity Codes",
+      "title": "Number of Identifiers",
       "transformations": [],
       "type": "barchart"
     },
@@ -1851,6 +1694,9 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "axisSoftMin": 0,
@@ -1864,6 +1710,9 @@
             "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -1880,7 +1729,8 @@
               }
             ]
           },
-          "unit": "locale"
+          "unit": "locale",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -1910,11 +1760,13 @@
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
+        "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "orientation": "auto",
         "showValue": "auto",
@@ -1978,16 +1830,16 @@
       "type": "barchart"
     }
   ],
-  "schemaVersion": 35,
-  "style": "dark",
+  "refresh": "",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
           "selected": false,
-          "text": "a3f62dd0-115e-455b-9862-74505bc304e0",
-          "value": "a3f62dd0-115e-455b-9862-74505bc304e0"
+          "text": "b22ce7c1-137d-4466-9a3e-c62238079e47",
+          "value": "b22ce7c1-137d-4466-9a3e-c62238079e47"
         },
         "hide": 0,
         "includeAll": false,
@@ -2017,6 +1869,6 @@
   "timezone": "",
   "title": "Governance Dashboard",
   "uid": "TWiqNSkSk",
-  "version": 12,
+  "version": 2,
   "weekStart": ""
 }

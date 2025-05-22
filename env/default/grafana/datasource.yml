@@ -22,11 +22,3 @@ datasources:
   jsonData:
     esVersion: '7.7.0'
     timeField: 'cluedincreated'
-- name: mssql
-  type: mssql
-  url: host.docker.internal
-  database: DataStore.Db.OpenCommunication
-  user: sa
-  uid: JmNKFSkSz
-  secureJsonData:
-    password: yourStrong(!)Password

@@ -103,6 +103,7 @@ services:
     - CluedIn_API_URL=${CLUEDIN_DATASOURCESUBMITTER_CLUE_API_URL:-/api/v2/clue?save=true}
     - DataSourceSubmitterHost=${CLUEDIN_DATASOURCESUBMITTER_HOST:-datasource-submitter}
     - DataSourceSubmitterWORKERS_NUMBER=4
+    - WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9000/
     ports:
       - "${CLUEDIN_DATASOURCESUBMITTER_LOCALPORT:-9012}:8888"
     depends_on:

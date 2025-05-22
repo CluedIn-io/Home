@@ -253,6 +253,17 @@ function Find-Environment {
     FindEnvironment @PSBoundParameters
 }
 
+function Get-EnvironmentValues {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+        [Parameter(Mandatory)]
+        [string]$Context
+    )
+
+    GetEnvironment @PSBoundParameters
+}
+
 function GetEnvironment {
     param(
         [Parameter(Mandatory)]
