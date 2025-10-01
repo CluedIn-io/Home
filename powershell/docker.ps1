@@ -95,6 +95,7 @@ function DockerCompose {
     }
     
     $gatewayEnabled = GetEnvironmentValue $Env CLUEDIN_ENABLE_API_GATEWAY
+    $localAzureStorageEnabled = GetEnvironmentValue $Env CLUEDIN_ENABLE_LOCAL_AZURE_STORAGE
 
     if($action -eq 'up' -or $action -eq 'start'){
         # If action is up/start - we need to ensure prometheus ports are updated
@@ -122,7 +123,6 @@ function DockerCompose {
             $Disable += "proxy"
         }
         
-        $env:CLUEDIN_PROXY_PUBLICURL=''	# env variable need to exist to avoid docker-compoose warning
         if ($gatewayEnabled -match '^(true|1)$') {
             if (!$proxyEnabled) {
                 throw "The api gateway requires the proxy to be enabled. Please set CLUEDIN_UI_LOCALPORT_HTTPS to enable the proxy"
@@ -141,6 +141,13 @@ function DockerCompose {
         else {
             $Disable += "gateway"
         }
+
+        if ($localAzureStorageEnabled -match '^(true|1)$') {
+            
+        }
+        else {
+            $Disable += "azurite"
+        }        
     }
 
     $compose = "docker-compose $projectName $composeFiles --project-directory '$envPath' --env-file '$(Join-Path $envPath .env)' $action"
