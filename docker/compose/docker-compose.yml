@@ -20,7 +20,7 @@ services:
             retries: 12
 
     elasticsearch:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.8.0
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.16.3
         environment:
             - discovery.type=single-node
             - search.max_open_scroll_context=1000
@@ -60,7 +60,7 @@ services:
             timeout: 5s
             retries: 12
     redis:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/redis:6.2.7-debian-11-r11
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/redis:7.4.1-debian-12-r2
         environment:
             - ALLOW_EMPTY_PASSWORD=yes
         ports:
