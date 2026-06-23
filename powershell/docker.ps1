@@ -240,7 +240,9 @@ function Invoke-DockerComposeDown {
     <# This is just a proxy function so DockerCompose does not leak internal parameters #>
     DockerCompose down @PSBoundParameters
 
-    if(-not $KeepData) {
+    $envKeepDataOnDown = GetEnvironmentValue $Env HOME_KEEP_DATA_ON_DOWN 'false'
+
+    if(($envKeepDataOnDown -ne 'true') -and (-not $KeepData)) {
         Invoke-Data -env $env -CleanAll
     }
 }

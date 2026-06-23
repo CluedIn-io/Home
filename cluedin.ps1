@@ -11,7 +11,7 @@ param(
 dynamicparam {
     $importedModule = Import-Module -Name ([IO.Path]::Combine($PSScriptRoot, 'powershell', 'cluedin.psm1')) -PassThru
     $scriptParams = $MyInvocation.MyCommand.Parameters.Keys
-    $ciAction = Get-CluedInDynamicAction -Action $Action -Context 'docker' -ExistingParams $scriptParams
+    $ciAction = Get-CluedInDynamicAction -Action $Action -ExistingParams $scriptParams
     if($ciAction) {
         return $ciAction.DynamicParams
     }

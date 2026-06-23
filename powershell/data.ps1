@@ -70,7 +70,7 @@ function Invoke-Data {
 
         if(Test-Path $Path) {
             Write-Host "Clearing data for ${Name}..." -NoNewline
-            Remove-Item $Path -Recurse -Force
+            Remove-Item $Path -Recurse -Force -ProgressAction SilentlyContinue
             Write-Host " Done" -ForegroundColor Green
         } else {
             Write-Host "No data found for ${Name}" -ForegroundColor DarkYellow

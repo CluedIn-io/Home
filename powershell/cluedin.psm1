@@ -17,8 +17,6 @@ function Get-CluedInDynamicAction {
     param(
         [Parameter(Mandatory)]
         [String]$Action,
-        [Parameter(Mandatory)]
-        [String]$Context,
         [String[]]$ExistingParams = @()
     )
 
@@ -29,11 +27,11 @@ function Get-CluedInDynamicAction {
     foreach ($cmd in $commands) {
         if(!$cmd.ScriptBlock.Attributes) { continue }
         $found = $cmd.ScriptBlock.Attributes.Find({
-            ($args[0].TypeId.Name -eq 'CluedInAction') -and ($args[0].Action -eq $Action) -and ($args[0].Context -eq $Context)
+            ($args[0].TypeId.Name -eq 'CluedInAction') -and ($args[0].Action -eq $Action)
         })
         if ($found) {
             $command = $cmd
-            $infoMessage = "CluedIn - $($found.Header -f $Action) [$Context]"
+            $infoMessage = "CluedIn - $($found.Header -f $Action)"
             $wrapper = '+' + ('-' * ($infoMessage.Length + 2) ) + '+'
             $line = "| ${infoMessage} |"
             $header = $wrapper,$line,$wrapper -join [Environment]::NewLine

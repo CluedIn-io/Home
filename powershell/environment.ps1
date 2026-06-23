@@ -85,7 +85,6 @@ function Invoke-Environment {
 
         # Base args to match to inner calls
         $innerArgs = @{
-            Context = 'docker'
             Name = $Name
         }
 
@@ -137,11 +136,6 @@ function InvokeEnvironment {
         [Parameter(Position=0, ParameterSetName='unset')]
         [Parameter(Position=0, ParameterSetName='remove')]
         [string]$Name = 'default',
-        [Parameter(Position=1, ParameterSetName='set')]
-        [Parameter(Position=1, ParameterSetName='get')]
-        [Parameter(Position=1, ParameterSetName='unset')]
-        [Parameter(Position=1, ParameterSetName='remove')]
-        [string]$Context = 'docker',
         [Parameter(ParameterSetName='set')]
         [string[]]$Set,
         [Parameter(ParameterSetName='set')]
@@ -159,7 +153,7 @@ function InvokeEnvironment {
 
         switch ($PSCmdlet.ParameterSetName) {
             'set' {
-                $env = (GetEnvironment $Name $Context) ?? (GetEnvironment 'default' $Context)
+                $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
 
                 $Set |
                     Where-Object { $_ } |
@@ -173,10 +167,10 @@ function InvokeEnvironment {
                     $SetCustom.Invoke($env)
                 }
 
-                SetEnvironment $Name $Context $env
+                SetEnvironment $Name $env
             }
             'Get' {
-                $env = GetEnvironment $Name $Context
+                $env = GetEnvironment $Name
                 if(-not $env) {
                     Write-Host "Could not find environment ${Name}";
                     return
@@ -186,7 +180,7 @@ function InvokeEnvironment {
 
             }
             'Unset' {
-                $env = (GetEnvironment $Name $Context) ?? (GetEnvironment 'default' $Context)
+                $env = (GetEnvironment $Name) ?? (GetEnvironment 'default')
                 foreach($rmKey in $Unset){
                     $foundKey = $env.Keys | Where-Object { $_ -eq $rmKey }
                     if($foundKey) {
@@ -194,17 +188,17 @@ function InvokeEnvironment {
                         $env.Remove($foundKey)
                     }
                 }
-                SetEnvironment $Name $Context $env
+                SetEnvironment $Name $env
             }
             'Remove' {
                 if($Name -eq 'default'){
                     Write-Host "You cannot remove the default environment."
                     return
                 }
-                $env = FindEnvironment $Name $Context
+                $env = FindEnvironment $Name
                 if($env) {
                     Write-Host "Removing '$Name' environment"
-                    Remove-Item $env -Recurse -Force
+                    Remove-Item $env -Recurse -Force -ProgressAction SilentlyContinue
                 }
             }
         }
@@ -214,12 +208,11 @@ function InvokeEnvironment {
 function FindEnvironment {
     param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [string]$Name,
-        [string]$Context = 'docker'
+        [string]$Name
     )
 
     process {
-        $root = if($Context -eq 'docker') { [Paths]::Env } else { [Paths]::ClusterEnv }
+        $root = [Paths]::Env
 
         $envDir = Get-ChildItem $root -Filter "${Name}" -ErrorAction Ignore
 
@@ -245,9 +238,7 @@ function FindEnvironment {
 function Find-Environment {
     param(
         [Parameter(Mandatory)]
-        [string]$Name,
-        [Parameter(Mandatory)]
-        [string]$Context
+        [string]$Name
     )
 
     FindEnvironment @PSBoundParameters
@@ -256,9 +247,7 @@ function Find-Environment {
 function Get-EnvironmentValues {
     param(
         [Parameter(Mandatory)]
-        [string]$Name,
-        [Parameter(Mandatory)]
-        [string]$Context
+        [string]$Name
     )
 
     GetEnvironment @PSBoundParameters
@@ -267,11 +256,10 @@ function Get-EnvironmentValues {
 function GetEnvironment {
     param(
         [Parameter(Mandatory)]
-        [string]$Name,
-        [string]$Context = 'docker'
+        [string]$Name
     )
 
-    $env = FindEnvironment $Name $Context
+    $env = FindEnvironment $Name
     if(!$env) { return $null}
 
     $envPath = Join-Path $env '.env'
@@ -293,11 +281,10 @@ function GetEnvironmentValue {
         [string]$Name,
         [Parameter(Mandatory)]
         [string]$Key,
-        [string]$DefaultValue = '',
-        [string]$Context = 'docker'
+        [string]$DefaultValue = ''
     )
 
-    $env = FindEnvironment $Name $Context
+    $env = FindEnvironment $Name
     $envPath = Join-Path $env '.env'
 
     if(Test-Path $envPath) {
@@ -321,12 +308,10 @@ function SetEnvironment {
         [Parameter(Mandatory)]
         [string]$Name,
         [Parameter(Mandatory)]
-        [string]$Context,
-        [Parameter(Mandatory)]
         [hashtable]$Settings
     )
 
-    $root = if($Context -eq 'docker') { [Paths]::Env } else { [Paths]::ClusterEnv }
+    $root = [Paths]::Env
     $rootPath = Join-Path $root $Name
     if(-not (Test-Path $rootPath)) { New-Item $rootPath -ItemType Directory > $null }
     $content = $Settings.GetEnumerator() |
@@ -361,11 +346,10 @@ function ParseEnvironmentEntry {
 function GetEnvironmentServiceTags {
     param(
         [Parameter(Mandatory)]
-        [string]$Name,
-        [string]$Context = 'docker'
+        [string]$Name
     )
 
-    $env = GetEnvironment $Name $Context
+    $env = GetEnvironment $Name
     if(!$env) { return }
 
     $envTags = @{}

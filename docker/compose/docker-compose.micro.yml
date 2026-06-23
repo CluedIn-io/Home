@@ -35,7 +35,7 @@ services:
     volumes:
       - datasource:/shared
     healthcheck:
-        test: wget --spider http://datasource:9011/status || exit 1
+        test: ["CMD-SHELL", "perl -MIO::Socket -e '$$s=IO::Socket::INET->new(\"datasource:9011\") or exit 1; print $$s \"GET /status HTTP/1.1\\r\\nHost: datasource\\r\\nConnection: close\\r\\n\\r\\n\"; while(<$$s>){exit 0 if /200 OK/} exit 1'"]
         interval: 10s
         timeout: 5s
         retries: 12
@@ -80,7 +80,7 @@ services:
     volumes:
       - datasource:/shared
     healthcheck:
-        test: wget -O - http://datasource-processing:5757/status | grep 'true' || exit 1
+        test: ["CMD-SHELL", "perl -MIO::Socket -e '$$s=IO::Socket::INET->new(\"datasource-processing:5757\") or exit 1; print $$s \"GET /status HTTP/1.1\\r\\nHost: datasource-processing\\r\\nConnection: close\\r\\n\\r\\n\"; while(<$$s>){exit 0 if /true/} exit 1'"]
         interval: 10s
         timeout: 5s
         retries: 12
@@ -97,6 +97,7 @@ services:
     - DbUserName=${CLUEDIN_SQLSERVER_USER}
     - SeqURL=http://${CLUEDIN_SEQ_HOST:-seq}:5341
     - SeqLoggingLevel=debug
+    - SKIP_AWAIT_ON_SERVER=true
     - ConsoleLoggingLevel=info
     - DataSourceSubmitterPort=${CLUEDIN_DATASOURCESUBMITTER_LOCALPORT:-9012}
     - PUBLIC_WEB_API=http://${CLUEDIN_SERVER_HOST:-server}:9007
@@ -120,7 +121,7 @@ services:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
     healthcheck:
-        test: wget -O - http://datasource-submitter:9012/status | grep 'true' || exit 1
+        test: ["CMD-SHELL", "perl -MIO::Socket -e '$$s=IO::Socket::INET->new(\"datasource-submitter:9012\") or exit 1; print $$s \"GET /status HTTP/1.1\\r\\nHost: datasource-submitter\\r\\nConnection: close\\r\\n\\r\\n\"; while(<$$s>){exit 0 if /true/} exit 1'"]
         interval: 10s
         timeout: 5s
         retries: 12

@@ -20,7 +20,7 @@ services:
             retries: 12
 
     elasticsearch:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.16.3
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.17.29
         environment:
             - discovery.type=single-node
             - search.max_open_scroll_context=1000

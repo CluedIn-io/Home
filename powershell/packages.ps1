@@ -195,7 +195,7 @@ function Invoke-Packages {
             [PSCustomObject[]]$Entries
         )
 
-        Remove-Item $packagesTxt -ErrorAction Ignore
+        Remove-Item $packagesTxt -ErrorAction Ignore -ProgressAction SilentlyContinue
         New-Item $packagesTxt -ItemType File > $null
         $Entries |
             Sort-Object 'Name' |
@@ -268,7 +268,7 @@ function Invoke-Packages {
         }
         'Clean' {
             Get-Item $components -ErrorAction Ignore |
-                Remove-Item -Recurse -Force -ErrorAction Ignore
+                Remove-Item -Recurse -Force -ErrorAction Ignore -ProgressAction SilentlyContinue
             Write-Host 'Packages cleaned'
         }
         'Restore' {
