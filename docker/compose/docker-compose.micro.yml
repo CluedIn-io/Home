@@ -35,7 +35,7 @@ services:
     volumes:
       - datasource:/shared
     healthcheck:
-        test: ["CMD-SHELL", "perl -MIO::Socket -e '$$s=IO::Socket::INET->new(\"datasource:9011\") or exit 1; print $$s \"GET /status HTTP/1.1\\r\\nHost: datasource\\r\\nConnection: close\\r\\n\\r\\n\"; while(<$$s>){exit 0 if /200 OK/} exit 1'"]
+        test: ["CMD", "node", "-e", "fetch('http://datasource:9011/status').then(r=>process.exit(r.ok?0:1))"]
         interval: 10s
         timeout: 5s
         retries: 12
@@ -80,7 +80,7 @@ services:
     volumes:
       - datasource:/shared
     healthcheck:
-        test: ["CMD-SHELL", "perl -MIO::Socket -e '$$s=IO::Socket::INET->new(\"datasource-processing:5757\") or exit 1; print $$s \"GET /status HTTP/1.1\\r\\nHost: datasource-processing\\r\\nConnection: close\\r\\n\\r\\n\"; while(<$$s>){exit 0 if /true/} exit 1'"]
+        test: ["CMD", "node", "-e", "fetch('http://datasource-processing:5757/status').then(r=>r.text()).then(t=>process.exit(t.includes('true')?0:1))"]
         interval: 10s
         timeout: 5s
         retries: 12
@@ -121,7 +121,7 @@ services:
         condition: ${CLUEDIN_COMMON_RESTART_POLICY:-unless-stopped}
         delay: 5s
     healthcheck:
-        test: ["CMD-SHELL", "perl -MIO::Socket -e '$$s=IO::Socket::INET->new(\"datasource-submitter:9012\") or exit 1; print $$s \"GET /status HTTP/1.1\\r\\nHost: datasource-submitter\\r\\nConnection: close\\r\\n\\r\\n\"; while(<$$s>){exit 0 if /true/} exit 1'"]
+        test: ["CMD", "node", "-e", "fetch('http://datasource-submitter:9012/status').then(r=>r.text()).then(t=>process.exit(t.includes('true')?0:1))"]
         interval: 10s
         timeout: 5s
         retries: 12

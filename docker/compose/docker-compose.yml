@@ -17,13 +17,15 @@ services:
             test: wget http://localhost:7474/ || exit 1
             interval: 10s
             timeout: 5s
-            retries: 12
+            retries: 24
 
     elasticsearch:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:7.17.29
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/elasticsearch/elasticsearch:9.5.1
         environment:
             - discovery.type=single-node
             - search.max_open_scroll_context=1000
+            - xpack.security.enabled=false
+            - ES_JAVA_OPTS=${CLUEDIN_ELASTIC_MAX_HEAP:+-Xms512m -Xmx}${CLUEDIN_ELASTIC_MAX_HEAP-}
         ports:
             - "${CLUEDIN_ELASTIC_HTTP_LOCALPORT:-9200}:9200"
             - "${CLUEDIN_ELASTIC_DATA_LOCALPORT:-9300}:9300"
@@ -34,15 +36,15 @@ services:
             retries: 12
 
     rabbitmq:
-        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/bitnami/rabbitmq:3.12.2-debian-11-r25
+        image: ${CLUEDIN_CONTAINER_REGISTRY:-cluedinprod.azurecr.io}/cluedin/rabbitmq:${CLUEDIN_RABBITMQ_TAG}
         ports:
             - "${CLUEDIN_RABBITMQ_DATA_LOCALPORT:-5672}:5672"
             - "${CLUEDIN_RABBITMQ_HTTP_LOCALPORT:-15672}:15672"
             - "${CLUEDIN_RABBITMQ_METRICS_LOCALPORT:-15692}:15692"
             - "${CLUEDIN_RABBITMQ_STREAMS_LOCALPORT:-5552}:5552"
         environment:
-            - RABBITMQ_USERNAME=${CLUEDIN_RABBITMQ_USERNAME:-cluedin}
-            - RABBITMQ_PASSWORD=${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}
+            - RABBITMQ_DEFAULT_USER=${CLUEDIN_RABBITMQ_USERNAME:-cluedin}
+            - RABBITMQ_DEFAULT_PASS=${CLUEDIN_RABBITMQ_PASSWORD:-cluedin}
         hostname: cluedin-dev
         volumes:
             - type: bind
@@ -53,7 +55,7 @@ services:
               target: /etc/rabbitmq/enabled_plugins
             - type: bind
               source: ./rabbitmq/cluedin_plugin.ez
-              target: /opt/bitnami/rabbitmq/plugins/cluedin_plugin.ez
+              target: /opt/rabbitmq/plugins/cluedin_plugin.ez
         healthcheck:
             test: rabbitmq-diagnostics is_running | grep 'fully booted and running' || exit 1
             interval: 10s
